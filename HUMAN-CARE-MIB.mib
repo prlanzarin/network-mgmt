@@ -1,0 +1,242 @@
+
+HUMAN-CARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, Gauge
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212;
+
+humanCare            OBJECT IDENTIFIER ::= { enterprises 6 }
+
+-- Informações do usuário monitorado.
+
+hcUserInfo           OBJECT IDENTIFIER ::= { humanCare 1 }
+
+-- Dados recebidos pelos sensores referentes ao estado corporal do usuário.
+
+hcBody               OBJECT IDENTIFIER ::= { humanCare 2 }
+
+-- Dados referentes ao ambiente em que o usuário se encontra.
+
+hcEnvironment        OBJECT IDENTIFIER ::= { humanCare 3 }
+
+-- Dados sobre os sensores conectados no usuário.
+
+hcSensor             OBJECT IDENTIFIER ::= { humanCare 4 }
+
+usrName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Nome do usuário que está sendo monitorado."
+	::= { hcUserInfo 1 }
+
+usrAge  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Idade do usuário que está sendo monitorado."
+	::= { hcUserInfo 2 }
+
+usrGender  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Genêro do usuário monitorado."
+	::= { hcUserInfo 3 }
+
+usrLatitude  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Coordenada geográfica de latitute em que o usuário monitorado se encontra."
+	::= { hcUserInfo 4 }
+
+usrLongitude  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Coordenada geográfica de longitude em que o usuário monitorado se encontra."
+	::= { hcUserInfo 5 }
+
+usrMotion  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Dados do acelerômetro conectado ao usuário monitorado."
+	::= { hcUserInfo 6 }
+
+usrOrientation  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Orientação do usuário monitorado."
+	::= { hcUserInfo 7 }
+
+bdBloodPressure  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Pressão arterial do usuário. "
+	::= { hcBody 1 }
+
+bdTemperature  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Temperatura do corpo do usuário em graus celsius."
+	::= { hcBody 2 }
+
+-- Frequência cardíaca do usuário monitorado.
+
+bdHeartRate  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		""
+	::= { hcBody 3 }
+
+bdHeartRhythmLeadI  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Sinal da lead I emitida pelo usuário monitorado."
+	::= { hcBody 4 }
+
+bdHeartRhythmLeadII  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Sinal da lead II emitida pelo usuário monitorado."
+	::= { hcBody 5 }
+
+bdBloodGlucose  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Nível de glicose no sangue do usuário monitorado."
+	::= { hcBody 6 }
+
+bdBloodOxygenSaturation  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Níveil de saturação do oxigênio do usuário monitorado."
+	::= { hcBody 7 }
+envHumidity  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Nível de humidade do ambiente."
+	::= { hcEnvironment 1 }
+
+envTemperature  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Temperatura do ambiente em graus Celsius."
+	::= { hcEnvironment 2 }
+
+envLuminosity  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Nível de luminosidade do ambiente."
+	::= { hcEnvironment 3 }
+
+envOxygen  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Nível de oxigenação do ambiente."
+	::= { hcEnvironment 4 }
+
+envAlarm  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Utilizado como boolean para indicar se o alarme ambiente deve ser acionado. "
+	::= { hcEnvironment 5 }
+
+hcSensorTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF HcSensorEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		""
+	::= { hcSensor 1 }
+
+hcSensorEntry  OBJECT-TYPE
+	SYNTAX 	HcSensorEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+		""
+	INDEX { sensorType }
+	::= { hcSensorTable 1 }
+
+HcSensorEntry ::= SEQUENCE {
+	sensorType
+		INTEGER,
+	sensorLocation
+		OCTET STRING,
+	sensorBatteryPower
+		Gauge,
+	sensorBaterryAlert
+		INTEGER
+}
+
+sensorType  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Identificação do sensor."
+	::= { hcSensorEntry 1 }
+
+sensorLocation  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"?"
+	::= { hcSensorEntry 2 }
+
+sensorBatteryPower  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Nível de bateria do sensor."
+	::= { hcSensorEntry 3 }
+
+sensorBaterryAlert  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Indicador de alerta de bateria. 1 - alerta. 0 - estado normal."
+	::= { hcSensorEntry 4 }
+END
+
+-- This MIB was created using NuDesign Technologies' Visual MIBuilder (Ver 5.2).
