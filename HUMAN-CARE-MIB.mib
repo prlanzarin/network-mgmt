@@ -4,9 +4,12 @@ IMPORTS
 	enterprises, Gauge
 		FROM RFC1155-SMI
 	OBJECT-TYPE
-		FROM RFC-1212;
+		FROM RFC-1212
+	xyzcorp
+		FROM XYZCORP-MIB;
 
-humanCare            OBJECT IDENTIFIER ::= { enterprises 6 }
+
+humanCare            OBJECT IDENTIFIER ::= { xyzcorp 6 }
 
 -- Informações do usuário monitorado.
 
