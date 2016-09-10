@@ -1,4 +1,3 @@
-
 HUMAN-CARE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -50,41 +49,33 @@ usrGender  OBJECT-TYPE
 	::= { hcUserInfo 3 }
 
 usrLatitude  OBJECT-TYPE
-	SYNTAX     Gauge
+	SYNTAX     INTEGER
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Coordenada geográfica de latitute em que o usuário monitorado se encontra."
 	::= { hcUserInfo 4 }
 
 usrLongitude  OBJECT-TYPE
-	SYNTAX     Gauge
+	SYNTAX     INTEGER
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Coordenada geográfica de longitude em que o usuário monitorado se encontra."
 	::= { hcUserInfo 5 }
 
-usrMotion  OBJECT-TYPE
-	SYNTAX     Gauge
+usrOrientation  OBJECT-TYPE
+	SYNTAX     INTEGER
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Dados do acelerômetro conectado ao usuário monitorado."
 	::= { hcUserInfo 6 }
 
-usrOrientation  OBJECT-TYPE
-	SYNTAX     Gauge
-	ACCESS     read-only
-	STATUS     mandatory
-	DESCRIPTION 
-		"Orientação do usuário monitorado."
-	::= { hcUserInfo 7 }
-
 bdBloodPressure  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Pressão arterial do usuário. "
 	::= { hcBody 1 }
@@ -92,25 +83,23 @@ bdBloodPressure  OBJECT-TYPE
 bdTemperature  OBJECT-TYPE
 	SYNTAX     INTEGER
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Temperatura do corpo do usuário em graus celsius."
 	::= { hcBody 2 }
 
--- Frequência cardíaca do usuário monitorado.
-
 bdHeartRate  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
-		""
+		" Frequência cardíaca do usuário monitorado."
 	::= { hcBody 3 }
 
 bdHeartRhythmLeadI  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Sinal da lead I emitida pelo usuário monitorado."
 	::= { hcBody 4 }
@@ -118,7 +107,7 @@ bdHeartRhythmLeadI  OBJECT-TYPE
 bdHeartRhythmLeadII  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Sinal da lead II emitida pelo usuário monitorado."
 	::= { hcBody 5 }
@@ -126,7 +115,7 @@ bdHeartRhythmLeadII  OBJECT-TYPE
 bdBloodGlucose  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Nível de glicose no sangue do usuário monitorado."
 	::= { hcBody 6 }
@@ -134,14 +123,15 @@ bdBloodGlucose  OBJECT-TYPE
 bdBloodOxygenSaturation  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Níveil de saturação do oxigênio do usuário monitorado."
 	::= { hcBody 7 }
+
 envHumidity  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Nível de humidade do ambiente."
 	::= { hcEnvironment 1 }
@@ -149,7 +139,7 @@ envHumidity  OBJECT-TYPE
 envTemperature  OBJECT-TYPE
 	SYNTAX     INTEGER
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Temperatura do ambiente em graus Celsius."
 	::= { hcEnvironment 2 }
@@ -157,7 +147,7 @@ envTemperature  OBJECT-TYPE
 envLuminosity  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Nível de luminosidade do ambiente."
 	::= { hcEnvironment 3 }
@@ -165,7 +155,7 @@ envLuminosity  OBJECT-TYPE
 envOxygen  OBJECT-TYPE
 	SYNTAX     Gauge
 	ACCESS     read-only
-	STATUS     mandatory
+	STATUS     optional
 	DESCRIPTION 
 		"Nível de oxigenação do ambiente."
 	::= { hcEnvironment 4 }
@@ -202,7 +192,7 @@ HcSensorEntry ::= SEQUENCE {
 		OCTET STRING,
 	sensorBatteryPower
 		Gauge,
-	sensorBaterryAlert
+	sensorBatteryAlert
 		INTEGER
 }
 
@@ -230,7 +220,7 @@ sensorBatteryPower  OBJECT-TYPE
 		"Nível de bateria do sensor."
 	::= { hcSensorEntry 3 }
 
-sensorBaterryAlert  OBJECT-TYPE
+sensorBatteryAlert  OBJECT-TYPE
 	SYNTAX     INTEGER
 	ACCESS     read-write
 	STATUS     mandatory
