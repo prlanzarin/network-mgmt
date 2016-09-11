@@ -224,7 +224,7 @@ sensorLocation  OBJECT-TYPE
 	ACCESS     read-write
 	STATUS     mandatory
 	DESCRIPTION 
-		"?"
+		"Descrição textual do setor onde o sensor está localizado e pelo qual é responsável"
 	::= { hcSensorEntry 2 }
 
 sensorBatteryPower  OBJECT-TYPE
