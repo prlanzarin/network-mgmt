@@ -27,6 +27,10 @@ hcEnvironment        OBJECT IDENTIFIER ::= { humanCare 3 }
 
 hcSensor             OBJECT IDENTIFIER ::= { humanCare 4 }
 
+-- Dados sobre a rede de comunicação com o agente do usuário.
+
+hcNetwork            OBJECT IDENTIFIER ::= { humanCare 5 }
+
 usrName  OBJECT-TYPE
 	SYNTAX     OCTET STRING
 	ACCESS     read-only
@@ -179,6 +183,14 @@ hcSensorTable  OBJECT-TYPE
 		""
 	::= { hcSensor 1 }
 
+hcSensorNumber  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Indica o número de sensores de ambiente presentes na organização modelada."
+	::= { hcSensor 2 }
+
 hcSensorEntry  OBJECT-TYPE
 	SYNTAX 	HcSensorEntry
 	ACCESS     not-accessible
@@ -230,6 +242,23 @@ sensorBatteryAlert  OBJECT-TYPE
 	DESCRIPTION 
 		"Indicador de alerta de bateria. 1 - alerta. 0 - estado normal."
 	::= { hcSensorEntry 4 }
+
+nwType  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+		"Tipo de rede utilizada pra conectar o gerente ao agente remoto no usuário (e.g.: 1 - WiFi, 2 - 3G)"
+	::= { hcNetwork 1 }
+
+
+nwSpeed  OBJECT-TYPE
+	SYNTAX     Gauge
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Velocidade da rede utilizada pra conectar o gerente ao agente remoto no usuário (em bit/s)"
+	::= { hcNetwork 2 }
 END
 
 -- This MIB was created using NuDesign Technologies' Visual MIBuilder (Ver 5.2).
