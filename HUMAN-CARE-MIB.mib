@@ -11,19 +11,19 @@ IMPORTS
 
 humanCare            OBJECT IDENTIFIER ::= { xyzcorp 6 }
 
--- InformaÁıes do usu·rio monitorado.
+-- Informa√ß√µes do usu√°rio monitorado.
 
 hcUserInfo           OBJECT IDENTIFIER ::= { humanCare 1 }
 
--- Dados recebidos pelos sensores referentes ao estado corporal do usu·rio.
+-- Dados recebidos pelos sensores referentes ao estado corporal do usu√°rio.
 
 hcBody               OBJECT IDENTIFIER ::= { humanCare 2 }
 
--- Dados referentes ao ambiente em que o usu·rio se encontra.
+-- Dados referentes ao ambiente em que o usu√°rio se encontra.
 
 hcEnvironment        OBJECT IDENTIFIER ::= { humanCare 3 }
 
--- Dados sobre os sensores conectados no usu·rio.
+-- Dados sobre os sensores conectados no usu√°rio.
 
 hcSensor             OBJECT IDENTIFIER ::= { humanCare 4 }
 
@@ -36,7 +36,7 @@ usrName  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     mandatory
 	DESCRIPTION 
-		"Nome do usu·rio que est· sendo monitorado."
+		"Nome do usu√°rio que est√° sendo monitorado."
 	::= { hcUserInfo 1 }
 
 usrAge  OBJECT-TYPE
@@ -44,7 +44,7 @@ usrAge  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     mandatory
 	DESCRIPTION 
-		"Idade do usu·rio que est· sendo monitorado."
+		"Idade do usu√°rio que est√° sendo monitorado."
 	::= { hcUserInfo 2 }
 
 usrGender  OBJECT-TYPE
@@ -52,7 +52,7 @@ usrGender  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     mandatory
 	DESCRIPTION 
-		"GenÍro do usu·rio monitorado."
+		"Gen√™ro do usu√°rio monitorado."
 	::= { hcUserInfo 3 }
 
 usrLatitude  OBJECT-TYPE
@@ -60,7 +60,7 @@ usrLatitude  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"Coordenada geogr·fica de latitute em que o usu·rio monitorado se encontra."
+		"Coordenada geogr√°fica de latitute em que o usu√°rio monitorado se encontra."
 	::= { hcUserInfo 4 }
 
 usrLongitude  OBJECT-TYPE
@@ -68,7 +68,7 @@ usrLongitude  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"Coordenada geogr·fica de longitude em que o usu·rio monitorado se encontra."
+		"Coordenada geogr√°fica de longitude em que o usu√°rio monitorado se encontra."
 	::= { hcUserInfo 5 }
 
 usrOrientation  OBJECT-TYPE
@@ -76,7 +76,7 @@ usrOrientation  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"Dados do acelerÙmetro conectado ao usu·rio monitorado."
+		"Dados do aceler√¥metro conectado ao usu√°rio monitorado."
 	::= { hcUserInfo 6 }
 
 bdBloodPressure  OBJECT-TYPE
@@ -84,7 +84,7 @@ bdBloodPressure  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"Press„o arterial do usu·rio. "
+		"Press√£o arterial do usu√°rio em mmHg (mil√≠metros de merc√∫rio). "
 	::= { hcBody 1 }
 
 bdTemperature  OBJECT-TYPE
@@ -92,7 +92,7 @@ bdTemperature  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"Temperatura do corpo do usu·rio em graus celsius."
+		"Temperatura do corpo do usu√°rio em graus celsius."
 	::= { hcBody 2 }
 
 bdHeartRate  OBJECT-TYPE
@@ -100,7 +100,7 @@ bdHeartRate  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		" FrequÍncia cardÌaca do usu·rio monitorado."
+		" Frequ√™ncia card√≠aca do usu√°rio monitorado em batimentos por minuto (bpm)."
 	::= { hcBody 3 }
 
 bdHeartRhythmLeadI  OBJECT-TYPE
@@ -108,7 +108,7 @@ bdHeartRhythmLeadI  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"Sinal da lead I emitida pelo usu·rio monitorado."
+		"Sinal da lead I emitida pelo usu√°rio monitorado."
 	::= { hcBody 4 }
 
 bdHeartRhythmLeadII  OBJECT-TYPE
@@ -116,7 +116,7 @@ bdHeartRhythmLeadII  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"Sinal da lead II emitida pelo usu·rio monitorado."
+		"Sinal da lead II emitida pelo usu√°rio monitorado."
 	::= { hcBody 5 }
 
 bdBloodGlucose  OBJECT-TYPE
@@ -124,7 +124,7 @@ bdBloodGlucose  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"NÌvel de glicose no sangue do usu·rio monitorado."
+		"N√≠vel de glicose no sangue do usu√°rio monitorado medido em mg/dl."
 	::= { hcBody 6 }
 
 bdBloodOxygenSaturation  OBJECT-TYPE
@@ -132,7 +132,7 @@ bdBloodOxygenSaturation  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"NÌveil de saturaÁ„o do oxigÍnio do usu·rio monitorado."
+		"N√≠vel de satura√ß√£o do oxig√™nio do usu√°rio monitorado, medido pela porcentagem de oxig√™nio que o sangue est√° transportando."
 	::= { hcBody 7 }
 
 envHumidity  OBJECT-TYPE
@@ -140,7 +140,7 @@ envHumidity  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"NÌvel de humidade do ambiente."
+		"Porcentagem de vapor de √°gua contida no ambiente."
 	::= { hcEnvironment 1 }
 
 envTemperature  OBJECT-TYPE
@@ -156,7 +156,7 @@ envLuminosity  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"NÌvel de luminosidade do ambiente."
+		"N√≠vel de luminosidade do ambiente medida em candela."
 	::= { hcEnvironment 3 }
 
 envOxygen  OBJECT-TYPE
@@ -164,7 +164,7 @@ envOxygen  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     optional
 	DESCRIPTION 
-		"NÌvel de oxigenaÁ„o do ambiente."
+		"N√≠vel de oxigena√ß√£o do ambiente (porcentagem)."
 	::= { hcEnvironment 4 }
 
 envAlarm  OBJECT-TYPE
@@ -216,7 +216,7 @@ sensorType  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     mandatory
 	DESCRIPTION 
-		"IdentificaÁ„o do sensor."
+		"Identifica√ß√£o do sensor."
 	::= { hcSensorEntry 1 }
 
 sensorLocation  OBJECT-TYPE
@@ -232,7 +232,7 @@ sensorBatteryPower  OBJECT-TYPE
 	ACCESS     read-only
 	STATUS     mandatory
 	DESCRIPTION 
-		"NÌvel de bateria do sensor."
+		"N√≠vel de bateria do sensor."
 	::= { hcSensorEntry 3 }
 
 sensorBatteryAlert  OBJECT-TYPE
