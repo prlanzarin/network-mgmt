@@ -1,0 +1,7 @@
+XYZCorp-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		-- enterprises FROM RFC1155-SMI,
+		   experimental FROM RFC1155-SMI;
+		-- XYZCorp OBJECT IDENTIFIER ::= { enterprises ?? }
+		   XYZCorp OBJECT IDENTIFIER ::= { experimental 57 }
+END

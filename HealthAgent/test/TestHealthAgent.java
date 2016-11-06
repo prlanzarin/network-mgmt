@@ -1,8 +1,8 @@
-package agent;
+
 
 
 import agent.HealthAgent;
-import agent.model.MOCreator;
+import agent.model.ScalarMOCreator;
 import java.io.IOException;
 
 import org.snmp4j.smi.OID;
@@ -44,7 +44,7 @@ public class TestHealthAgent {
 
         // Register a system description, use one from you product environment
         // to test with
-        agent.registerManagedObject(MOCreator.createReadOnly(sysDescr,
+        agent.registerManagedObject(ScalarMOCreator.createReadOnly(sysDescr,
             "Random Description"));
 
         // Setup the client to use our newly started agent

@@ -1,5 +1,6 @@
 package agent;
 
+import agent.model.MibContainer;
 import java.io.File;
 import java.io.IOException;
 
@@ -34,16 +35,21 @@ public class HealthAgent extends BaseAgent {
     private final String address;
     private static final String CONF_FILE = "conf.agent";
     private static final String BOOT_COUNTER_FILE = "bootCounter.agent";
-
+    /* MUST NOT FORGET TO LOAD PARENT MIB FIRST (XYZCorp) */
+    private static final String MIB_FILE = "../HUMAN-CARE-MIB.mib";
+    /* MIB MANAGEMENT CONTAINER USING MIBBLE */
+    private static MibContainer mib = null;
+    
     /**
      *
-     * @param address
+     * @param address mib network address (localhost for tests)
      * @throws IOException
      */
     public HealthAgent(String address) throws IOException {
         super(new File(CONF_FILE), new File(BOOT_COUNTER_FILE),
             new CommandProcessor(new OctetString(MPv3.createLocalEngineID())));
         this.address = address;
+        this.mib = new MibContainer(MIB_FILE);
     }
 
     /**

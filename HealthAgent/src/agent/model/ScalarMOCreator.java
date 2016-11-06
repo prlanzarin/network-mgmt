@@ -6,11 +6,23 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 
-public class MOCreator {
+public class ScalarMOCreator {
 
     public static MOScalar createReadOnly(OID oid, Object value) {
         return new MOScalar(oid,
             MOAccessImpl.ACCESS_READ_ONLY,
+            getVariable(value));
+    }
+    
+    public static MOScalar createReadWrite(OID oid, Object value) {
+        return new MOScalar(oid,
+            MOAccessImpl.ACCESS_READ_WRITE,
+            getVariable(value));
+    }
+    
+    public static MOScalar createReadCreate(OID oid, Object value) {
+        return new MOScalar(oid,
+            MOAccessImpl.ACCESS_READ_CREATE,
             getVariable(value));
     }
 

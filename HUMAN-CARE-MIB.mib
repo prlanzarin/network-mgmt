@@ -5,12 +5,12 @@ IMPORTS
 		FROM RFC1155-SMI
 	OBJECT-TYPE
 		FROM RFC-1212
-	xyzcorp
-		FROM XYZCORP-MIB;
+    XYZCorp	
+		FROM XYZCorp-MIB;
 
 -- Initial MIB specification for a manageable body area network system. The focus is to build a monitoring system for high-risk environments, enabling a central manager to monitor user's health state and take corresponding according to the information provided by agents installed on users' uniforms. The information capture is handled by a number of sensors which work in synergy with the agents. AUTHORS: Amanda Rieth Torbes, Paulo Renato Lanzarin.
 
-humanCare            OBJECT IDENTIFIER ::= { xyzcorp 6 }
+humanCare            OBJECT IDENTIFIER ::= { XYZCorp 6 }
 
 -- General information regarding a monitored user.
 
