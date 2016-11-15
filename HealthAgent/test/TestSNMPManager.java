@@ -14,17 +14,20 @@ import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
-import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import utils.Constants;
 
-public class SNMPManager {
+public class TestSNMPManager {
 
     Snmp snmp = null;
     String address = null;
 
-    public SNMPManager(String add) {
+    /**
+     * Constructor
+     *
+     * @param add
+     */
+    public TestSNMPManager(String add) {
         address = add;
     }
 
@@ -35,9 +38,13 @@ public class SNMPManager {
          */
         SNMPManager client = new SNMPManager("udp:127.0.0.1/161");
         client.start();
-        
-        String usrName = client.getAsString(Constants.usrName);
-        System.out.println(usrName);
+        /**
+         * OID - .1.3.6.1.2.1.1.1.0 => SysDec OID - .1.3.6.1.2.1.1.5.0 =>
+         * SysName => MIB explorer will be usefull here, as discussed in
+         * previous article
+         */
+        String sysDescr = client.getAsString(new OID(".1.3.6.1.2.1.1.1.0"));
+        System.out.println(sysDescr);
     }
 
     /**
@@ -69,8 +76,7 @@ public class SNMPManager {
 
     /**
      * This method is capable of handling multiple OIDs
-     * and generates get PDUs for them
-     * 
+     *
      * @param oids
      * @return
      * @throws IOException
@@ -81,50 +87,28 @@ public class SNMPManager {
             pdu.add(new VariableBinding(oid));
         }
         pdu.setType(PDU.GET);
-        ResponseEvent event = snmp.get(pdu, getTarget("public"));
+        ResponseEvent event = snmp.send(pdu, getTarget(), null);
         if (event != null) {
             return event;
         }
         throw new RuntimeException("GET timed out");
     }
-    
-     /**
-     * Generates a set request for the given OID
-     *
-     * @param oid
-     * @param var
-     * @return
-     * @throws IOException
-     */
-    public ResponseEvent set(OID oid, Variable var) throws IOException {
-        ResponseEvent event = null;
-        PDU pdu = new PDU();
-        VariableBinding varBind = new VariableBinding(oid, var);
-        pdu.add(varBind);
-        pdu.setType(PDU.SET);
-        
-        event = snmp.set(pdu, getTarget("cpublic"));
-        System.out.println("SET PDU for " + oid + " with " + var);
-        if (event != null) {
-            return event;
-        }
-        throw new RuntimeException("SET timed out");
-    }
-    
+
     /**
      * This method returns a Target, which contains information about where the
      * data should be fetched and how.
      *
      * @return
      */
-    private Target getTarget(String community) {
+    private Target getTarget() {
         Address targetAddress = GenericAddress.parse(address);
         CommunityTarget target = new CommunityTarget();
-        target.setCommunity(new OctetString(community));
+        target.setCommunity(new OctetString("public"));
         target.setAddress(targetAddress);
         target.setRetries(2);
         target.setTimeout(1500);
         target.setVersion(SnmpConstants.version2c);
         return target;
-    } 
+    }
+
 }

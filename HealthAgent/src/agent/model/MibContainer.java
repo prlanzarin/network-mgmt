@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -20,11 +22,12 @@ public class MibContainer {
 
     private Mib mib = null;
     private HashMap mibMappings = null;
+    private SortedSet<String> oids = null;
     private File mibFile = null;
     private static final Logger logger = Logger.getLogger(MibContainer.class);
 
     public MibContainer(String mibName) {
-        this.mibFile =new File(mibName);
+        this.mibFile = new File(mibName);
         
         try {
             this.setMib(loadMib(this.mibFile));
@@ -37,6 +40,8 @@ public class MibContainer {
         }
         
         this.setMibMappings(extractOids(this.mib));
+        this.oids = new TreeSet<>(mibMappings.keySet());
+        System.out.println(oids);
     }
 
     private Mib loadMib(File file)
@@ -48,6 +53,14 @@ public class MibContainer {
         return loader.load(file);
     }
 
+    /**
+     * Method which takes a loaded MIB and generates a HashMap of
+     * OID -> MibSymbol
+     *
+     * @param mib
+     * @return HashMap
+     * @throws IOException
+     */
     private HashMap extractOids(Mib mib) {
         HashMap map = new HashMap();
         Iterator iter = mib.getAllSymbols().iterator();
@@ -58,12 +71,19 @@ public class MibContainer {
             symbol = (MibSymbol) iter.next();
             value = extractOid(symbol);
             if (value != null) {
-                map.put(symbol.getName(), value);
+                map.put(value.toString(), symbol);
             }
         }
         return map;
     }
-
+    
+    /**
+     * Method which takes a MibSymbol and extracts its ObjectIndentifierValue
+     *
+     * @param symbol
+     * @return ObjectIdentifierValue
+     * @throws IOException
+     */
     private ObjectIdentifierValue extractOid(MibSymbol symbol) {
         MibValue value;
 
@@ -96,11 +116,26 @@ public class MibContainer {
     public final HashMap getMibMappings() {
         return mibMappings;
     }
+    
+    /**
+     * @return sorted set of OIDs
+     */
+    public final SortedSet<String> getOids() {
+        return oids;
+    }
 
     /**
      * @param mibMappings the mibMappings to set
      */
     public final void setMibMappings(HashMap mibMappings) {
         this.mibMappings = mibMappings;
+    }
+
+    private void printMibMappings(HashMap mibMappings) {
+        for (Object name: mibMappings.keySet()){
+            String key = name.toString();
+            String value = mibMappings.get(name).toString();  
+            System.out.println(key + " =====> " + value);  
+        }   
     }
 }

@@ -2,14 +2,25 @@
 
 
 import agent.HealthAgent;
+import agent.model.MibContainer;
 import agent.model.ScalarMOCreator;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.SortedSet;
+import net.percederberg.mibble.MibSymbol;
+import net.percederberg.mibble.MibType;
+import net.percederberg.mibble.MibValueSymbol;
+import net.percederberg.mibble.snmp.SnmpAccess;
+import net.percederberg.mibble.snmp.SnmpObjectType;
+import org.snmp4j.agent.BaseAgent;
+import org.snmp4j.agent.mo.MOScalar;
 
 import org.snmp4j.smi.OID;
+import org.snmp4j.smi.OctetString;
+import utils.Constants;
+import utils.Utils;
 
 public class TestHealthAgent {
-
-    static final OID sysDescr = new OID(".1.3.6.1.2.1.1.1.0");
 
     public static void main(String[] args) throws IOException {
         TestHealthAgent client = new TestHealthAgent("udp:127.0.0.1/161");
@@ -34,24 +45,16 @@ public class TestHealthAgent {
     }
 
     private void init() throws IOException {
-        agent = new HealthAgent("0.0.0.0/2001");
+        agent = new HealthAgent("udp:0.0.0.0/2001");
         agent.start();
-
-        // Since BaseAgent registers some MIBs by default we need to unregister
-        // one before we register our own sysDescr. Normally you would
-        // override that method and register the MIBs that you need
-        agent.unregisterManagedObject(agent.getSnmpv2MIB());
-
-        // Register a system description, use one from you product environment
-        // to test with
-        agent.registerManagedObject(ScalarMOCreator.createReadOnly(sysDescr,
-            "Random Description"));
-
+        
         // Setup the client to use our newly started agent
         client = new SNMPManager("udp:127.0.0.1/2001");
         client.start();
+        // Set value
+        client.set(Constants.usrName, new OctetString("Michel Temer"));
         // Get back Value which is set
-        System.out.println(client.getAsString(sysDescr));
+        System.out.println(client.getAsString(Constants.usrName));
     }
 
 }

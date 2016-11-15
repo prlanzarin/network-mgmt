@@ -1,8 +1,16 @@
 package agent;
 
 import agent.model.MibContainer;
+import agent.model.ScalarMOCreator;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.SortedSet;
+import net.percederberg.mibble.MibSymbol;
+import net.percederberg.mibble.MibType;
+import net.percederberg.mibble.MibValueSymbol;
+import net.percederberg.mibble.snmp.SnmpAccess;
+import net.percederberg.mibble.snmp.SnmpObjectType;
 
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.BaseAgent;
@@ -10,6 +18,7 @@ import org.snmp4j.agent.CommandProcessor;
 import org.snmp4j.agent.DuplicateRegistrationException;
 import org.snmp4j.agent.MOGroup;
 import org.snmp4j.agent.ManagedObject;
+import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.agent.mo.MOTableRow;
 import org.snmp4j.agent.mo.snmp.RowStatus;
 import org.snmp4j.agent.mo.snmp.SnmpCommunityMIB;
@@ -29,6 +38,7 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.transport.TransportMappings;
+import utils.Utils;
 
 public class HealthAgent extends BaseAgent {
 
@@ -38,8 +48,8 @@ public class HealthAgent extends BaseAgent {
     /* MUST NOT FORGET TO LOAD PARENT MIB FIRST (XYZCorp) */
     private static final String MIB_FILE = "../HUMAN-CARE-MIB.mib";
     /* MIB MANAGEMENT CONTAINER USING MIBBLE */
-    private static MibContainer mib = null;
-    
+    private MibContainer mib = null;
+
     /**
      *
      * @param address mib network address (localhost for tests)
@@ -54,6 +64,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds community to security name mappings needed for SNMPv1 and SNMPv2c.
+     * @param communityMIB
      */
     @Override
     protected void addCommunities(SnmpCommunityMIB communityMIB) {
@@ -73,6 +84,8 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds initial notification targets and filters.
+     * @param arg0
+     * @param arg1
      */
     @Override
     protected void addNotificationTargets(SnmpTargetMIB arg0,
@@ -83,6 +96,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds all the necessary initial users to the USM.
+     * @param arg0
      */
     @Override
     protected void addUsmUser(USM arg0) {
@@ -92,6 +106,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds initial VACM configuration.
+     * @param vacm
      */
     @Override
     protected void addViews(VacmMIB vacm) {
@@ -116,7 +131,6 @@ public class HealthAgent extends BaseAgent {
      */
     @Override
     protected void unregisterManagedObjects() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -131,6 +145,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Clients can register the MO they need
+     * @param mo
      */
     public void registerManagedObject(ManagedObject mo) {
         try {
@@ -161,14 +176,56 @@ public class HealthAgent extends BaseAgent {
     public void start() throws IOException {
 
         init();
-        // This method reads some old config from a file and causes
-        // unexpected behavior.
-        // loadConfig(ImportModes.REPLACE_CREATE);
         addShutdownHook();
         getServer().addContext(new OctetString("public"));
         finishInit();
         run();
         sendColdStartNotification();
+        // Since BaseAgent registers some MIBs by default we need to unregister
+        // one before we register our own sysDescr. Normally you would
+        // override that method and register the MIBs that you need
+        this.unregisterManagedObject(this.getSnmpv2MIB());
+        this.setUp();
     }
+    
+    public MibContainer getMibContainer() {
+        return this.mib;
+    }
+    
+    /**
+     * This method initializes the in-memory MIB at the agent
+     * 
+     */
+    public void setUp() {
+        HashMap mibMappings = mib.getMibMappings();
+        SortedSet<String> mibOids = mib.getOids();
+        
+        for (String oid : mibOids) {
+            MibSymbol symbol = (MibSymbol) mibMappings.get(oid);
+            MibType type = ((MibValueSymbol) symbol).getType();
 
+            if (((MibValueSymbol) symbol).isScalar()) {
+                MibType syntax = ((SnmpObjectType) type).getSyntax();
+                SnmpAccess mode = ((SnmpObjectType) type).getAccess();
+
+                System.out.println("OBJECT TYPE (SCALAR) => " + syntax.getName()
+                    + " OID => " + Utils.extractSnmp4jOid(symbol) + " MODE => " + mode.toString());
+
+                MOScalar smo = ScalarMOCreator.create(Utils.extractSnmp4jOid(symbol),
+                    null, syntax.getName(), Utils.extractSnmp4jMode(mode));
+                this.registerManagedObject(smo);
+            } else if (((MibValueSymbol) symbol).isTable()) {
+                MibType syntax = ((SnmpObjectType) type).getSyntax();
+                System.out.println("OBJECT TYPE (TABLE) => " + syntax.getName());
+            } else if (((MibValueSymbol) symbol).isTableColumn()) {
+                MibType syntax = ((SnmpObjectType) type).getSyntax();
+                System.out.println("OBJECT TYPE (CLMN) => " + syntax.getName());
+            } else if (((MibValueSymbol) symbol).isTableRow()) {
+                MibType syntax = ((SnmpObjectType) type).getSyntax();
+                System.out.println("OBJECT TYPE (ROW) => " + syntax.getName());
+            } else {
+                System.out.println("OBJECT TYPE => " + ((MibValueSymbol) symbol).getName());
+            }
+        }
+    }
 }

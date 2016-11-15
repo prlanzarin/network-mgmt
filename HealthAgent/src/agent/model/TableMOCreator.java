@@ -5,14 +5,12 @@ import java.util.List;
 import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.DefaultMOMutableRow2PC;
 import org.snmp4j.agent.mo.DefaultMOTable;
-import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.agent.mo.MOColumn;
 import org.snmp4j.agent.mo.MOMutableTableModel;
 import org.snmp4j.agent.mo.MOTable;
 import org.snmp4j.agent.mo.MOTableIndex;
 import org.snmp4j.agent.mo.MOTableSubIndex;
 import org.snmp4j.smi.OID;
-import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.SMIConstants;
 import org.snmp4j.smi.Variable;
 

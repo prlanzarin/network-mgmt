@@ -34,7 +34,7 @@ hcNetwork            OBJECT IDENTIFIER ::= { humanCare 5 }
 
 usrName  OBJECT-TYPE
 	SYNTAX     OCTET STRING
-	ACCESS     read-only
+	ACCESS     read-write
 	STATUS     mandatory
 	DESCRIPTION 
 		"Name of the currently monitored user."
@@ -42,7 +42,7 @@ usrName  OBJECT-TYPE
 
 usrAge  OBJECT-TYPE
 	SYNTAX     INTEGER
-	ACCESS     read-only
+	ACCESS     read-write
 	STATUS     mandatory
 	DESCRIPTION 
 		"Age of the currently monitored user."
@@ -50,7 +50,7 @@ usrAge  OBJECT-TYPE
 
 usrGender  OBJECT-TYPE
 	SYNTAX     OCTET STRING
-	ACCESS     read-only
+	ACCESS     read-write
 	STATUS     mandatory
 	DESCRIPTION 
 		"Gender of the currently monitored user."
