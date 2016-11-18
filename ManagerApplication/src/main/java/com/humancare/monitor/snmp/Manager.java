@@ -34,22 +34,29 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
  */
 public class Manager {
 
+    private static Manager instance = null;
     private Snmp snmp = null;
     private String address = null;    
     private static int requestID = 1;
     
     
-    public Manager(){}
+    protected Manager(){}
     
-    public Manager(String add) {
-         address = add;
-     /*   try {           
-            Manager client = new Manager("udp:127.0.0.1/161");
-            client.start();
-         } catch (IOException ex) {
-            ex.printStackTrace();
+    public static Manager getInsance(){
+        if(instance == null){
+            instance = new Manager();
         }
-    */
+        return instance;        
+    }
+    
+    public void configManager(String add) {
+         address = add;
+         try {           
+            //Manager client = new Manager("udp:127.0.0.1/161");
+            instance.start();
+         } catch (IOException ex) {
+            ex.printStackTrace();        }
+    
     }
 
     /**
@@ -168,9 +175,10 @@ public class Manager {
     public PatientData getAllPatientInformation(OID[] oids){
         
         PatientData patientData = new PatientData();
-        try {
+    //    try {
+            patientData.setReceivedDateAndTime(System.currentTimeMillis());
             
-            ResponseEvent response = get(oids);
+    /*         ResponseEvent response = get(oids);
             
             PDU pdu = response.getResponse();
             patientData.setName(pdu.get(0).getVariable().toString());
@@ -183,12 +191,13 @@ public class Manager {
             patientData.setZ(Float.parseFloat(pdu.get(7).getVariable().toString()));
             patientData.setBloodPressure(Float.parseFloat(pdu.get(8).getVariable().toString()));
             patientData.setTemperature(Float.parseFloat(pdu.get(9).getVariable().toString()));
-            patientData.setHeartRate(pdu.get(10).getVariable().toString());
+            patientData.setHeartRate(Float.parseFloat(pdu.get(10).getVariable().toString()));
             patientData.setBloodGlucose(Float.parseFloat(pdu.get(11).getVariable().toString()));
             patientData.setSPO2(pdu.get(12).getVariable().toString());
-          
+       */
+               
             
-       /*     patientData.setName("Teste");
+           patientData.setName("Teste");
             patientData.setAge("22");
             patientData.setGender("Feminino");
             patientData.setLatitute((float)10.6);
@@ -198,13 +207,12 @@ public class Manager {
             patientData.setZ((float) 8);
             patientData.setBloodPressure((float) 11.3);
             patientData.setTemperature((float) 36.5);
-            patientData.setHeartRate("45");
+            patientData.setHeartRate(80);
             patientData.setBloodGlucose((float) 50);
-            patientData.setSPO2("10");*/
-            
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+            patientData.setSPO2("10");
+      //  } catch (IOException ex) {
+        //    ex.printStackTrace();
+        //}
     
         return patientData;
     }

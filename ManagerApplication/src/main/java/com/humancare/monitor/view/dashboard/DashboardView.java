@@ -5,28 +5,14 @@ import java.util.Iterator;
 
 import com.google.common.eventbus.Subscribe;
 import com.humancare.monitor.DashboardUI;
-import com.humancare.monitor.component.SparklineChart;
-import com.humancare.monitor.component.TopGrossingMoviesChart;
-import com.humancare.monitor.component.TopSixTheatersChart;
-import com.humancare.monitor.component.TopTenMoviesTable;
-import com.humancare.monitor.data.dummy.DummyDataGenerator;
 import com.humancare.monitor.domain.DashboardNotification;
 import com.humancare.monitor.event.DashboardEvent.CloseOpenWindowsEvent;
 import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import com.humancare.monitor.event.DashboardEventBus;
-import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.humancare.monitor.view.dashboard.DashboardEdit.DashboardEditListener;
-import com.vaadin.addon.charts.Chart;
-import com.vaadin.addon.charts.model.AxisTitle;
-import com.vaadin.addon.charts.model.ChartType;
-import com.vaadin.addon.charts.model.Configuration;
-import com.vaadin.addon.charts.model.DataLabels;
-import com.vaadin.addon.charts.model.ListSeries;
-import com.vaadin.addon.charts.model.PlotOptionsLine;
-import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -50,7 +36,6 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -69,14 +54,18 @@ public final class DashboardView extends Panel implements View,
     private final VerticalLayout root;
     private Window notificationsWindow;
     
-    private PatientDataManager patientDataManager;
+    private PatientDataManager patientDataManager = PatientDataManager.getInstance();
     private PatientData patientData;
     private ComboBox<RegisteredPatients> patientSelect;
+    
+    private int numberOfDays = 7;
+    private DashboardCharts dashboardCharts;
+    
+     
+    // TODO: atributo e campo para definir numero de dias que deseja-se obter nos graficos 
 
     public DashboardView() {
-        
-        patientDataManager = new PatientDataManager();
-        
+                
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
         DashboardEventBus.register(this);
@@ -89,8 +78,10 @@ public final class DashboardView extends Panel implements View,
         Responsive.makeResponsive(root);
 
         root.addComponent(buildHeader());
-        root.addComponent(getHeartRateChart());
-        root.addComponent(getTemperatureChart());
+        patientDataManager.selectPatientByDate(numberOfDays);
+        
+       // root.addComponent(getHeartRateChart());
+       // root.addComponent(getTemperatureChart());
 
         Component content = buildContent();
         root.addComponent(content);
@@ -112,82 +103,13 @@ public final class DashboardView extends Panel implements View,
     
     // Get all registered patients and put in combo box component
     private void initPatientSelect(){
-        List<RegisteredPatients> regPatients = patientDataManager.getRegisteredPatients();
+        List<RegisteredPatients> regPatients = patientDataManager.getPatientList();
         if(regPatients != null){
             patientSelect.setDataSource(new ListDataSource<>(regPatients));
         }
         
     }
-    
-    //TODO: get real data
-    protected Component getTemperatureChart() {
-        Chart chart = new Chart();
-        chart.setHeight("400px");
-        chart.setWidth("40%");
-
-        Configuration configuration = chart.getConfiguration();
-        configuration.getChart().setType(ChartType.LINE);
-
-        configuration.getTitle().setText("Temperature");
-        configuration.getSubTitle().setText("");
-        configuration.getxAxis().setCategories("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
-
-        YAxis yAxis = configuration.getyAxis();
-        yAxis.setTitle(new AxisTitle("Temperature (°C)"));
-
-        configuration
-                .getTooltip()
-                .setFormatter(
-                        "'<b>'+ this.series.name +'</b><br/>'+this.x +': '+ this.y +'°C'");
-
-        PlotOptionsLine plotOptions = new PlotOptionsLine();
-        plotOptions.setDataLabels(new DataLabels(true));
-        plotOptions.setEnableMouseTracking(false);
-        configuration.setPlotOptions(plotOptions);
-
-        ListSeries ls = new ListSeries();
-        ls.setName("Teste");
-        ls.setData(14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3);
-        configuration.addSeries(ls);
-
-        chart.drawChart(configuration);
-        return chart;
-    }
-    
-     //TODO: get real data
-    protected Component getHeartRateChart() {
-        Chart chart = new Chart();
-        chart.setHeight("400px");
-        chart.setWidth("40%");
-
-        Configuration configuration = chart.getConfiguration();
-        configuration.getChart().setType(ChartType.LINE);
-
-        configuration.getTitle().setText("Heart Rate");
-        configuration.getSubTitle().setText("");
-        configuration.getxAxis().setCategories("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
-
-        YAxis yAxis = configuration.getyAxis();
-        yAxis.setTitle(new AxisTitle("Heart Rate (bpm)"));
-
-        configuration
-                .getTooltip()
-                .setFormatter(
-                        "'<b>'+ this.series.name +'</b><br/>'+this.x +': '+ this.y +'bpm'");
-
-        PlotOptionsLine plotOptions = new PlotOptionsLine();
-        plotOptions.setDataLabels(new DataLabels(true));
-        plotOptions.setEnableMouseTracking(false);
-        configuration.setPlotOptions(plotOptions);
-
-        ListSeries ls = new ListSeries();
-        ls.setName("Teste");
-        ls.setData(120, 110, 30, 100, 110, 110, 110);
-        configuration.addSeries(ls);
-
-        chart.drawChart(configuration);
-        return chart;
-    }
+          
         
     private Component buildPatientSelector() {
         HorizontalLayout toolbar = new HorizontalLayout();
@@ -279,34 +201,19 @@ public final class DashboardView extends Panel implements View,
     }
 
     private Component buildContent() {
+        dashboardCharts = new DashboardCharts(numberOfDays);
+        
         dashboardPanels = new CssLayout();
         dashboardPanels.addStyleName("dashboard-panels");
         Responsive.makeResponsive(dashboardPanels);
 
-        dashboardPanels.addComponent(buildTopGrossingMovies());
-    //    dashboardPanels.addComponent(buildTop10TitlesByRevenue());
-    //    dashboardPanels.addComponent(buildPopularMovies());
+        dashboardPanels.addComponent(dashboardCharts.getHeartRateChart());
+        dashboardPanels.addComponent(dashboardCharts.getTemperatureChart());
 
         return dashboardPanels;
     }
 
-    private Component buildTopGrossingMovies() {
-        TopGrossingMoviesChart topGrossingMoviesChart = new TopGrossingMoviesChart();
-        topGrossingMoviesChart.setSizeFull();
-        return createContentWrapper(topGrossingMoviesChart);
-    }
-
-   
-
-    private Component buildTop10TitlesByRevenue() {
-        Component contentWrapper = createContentWrapper(new TopTenMoviesTable());
-        contentWrapper.addStyleName("top10-revenue");
-        return contentWrapper;
-    }
-
-    private Component buildPopularMovies() {
-        return createContentWrapper(new TopSixTheatersChart());
-    }
+  
 
     private Component createContentWrapper(final Component content) {
         final CssLayout slot = new CssLayout();

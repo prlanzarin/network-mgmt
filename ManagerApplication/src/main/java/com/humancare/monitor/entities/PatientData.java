@@ -5,10 +5,9 @@
  */
 package com.humancare.monitor.entities;
 
-import static com.humancare.monitor.DashboardUI.MANAGER;
-import static com.humancare.monitor.snmp.Manager.OID_S;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import org.snmp4j.smi.OID;
 
 /**
  *
@@ -24,7 +23,7 @@ public class PatientData {
     private float temperature;
     private float bloodPressure;
     private float bloodGlucose;
-    private String heartRate;
+    private float heartRate;
     private String SPO2;
     private float latitute;
     private float longitude;
@@ -40,7 +39,18 @@ public class PatientData {
     private List<Sensor> sensorsList;
     private String nwType;
     private String nwSpeed;
-    
+    private Date receivedDateAndTime;
+
+    public Date getReceivedDateAndTime() {
+        return receivedDateAndTime;
+    }
+
+    public void setReceivedDateAndTime(Long receivedDateAndTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");    
+        Date resultdate = new Date(receivedDateAndTime);
+        System.out.println(sdf.format(resultdate));
+        this.receivedDateAndTime = resultdate;
+    }    
 
     public String getName() {
         return name;
@@ -90,11 +100,11 @@ public class PatientData {
         this.bloodGlucose = bloodGlucose;
     }
 
-    public String getHeartRate() {
+    public float getHeartRate() {
         return heartRate;
     }
 
-    public void setHeartRate(String heartRate) {
+    public void setHeartRate(float heartRate) {
         this.heartRate = heartRate;
     }
 

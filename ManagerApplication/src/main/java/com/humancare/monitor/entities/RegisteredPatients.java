@@ -15,8 +15,7 @@ import java.util.List;
 public class RegisteredPatients {
     
     private String name;
-    private String ip;
-    private static List<RegisteredPatients> patientList;
+    private String ip;   
     
     public RegisteredPatients() {
     }
@@ -26,27 +25,6 @@ public class RegisteredPatients {
         this.ip = ip;
     }
     
-    public void addPatient(String name, String ip){
-        if(patientList == null){
-            patientList = new ArrayList<RegisteredPatients>();
-        }
-        
-        patientList.add(new RegisteredPatients(name, ip));
-        
-        
-    }
-
-    public List<RegisteredPatients> getPatientList() {        
-        addPatient("teste", "ble");
-        return patientList;
-    }
-
-    public void setPatientList(List<RegisteredPatients> patientList) {
-        this.patientList = patientList;
-    }
-    
-    
-
     public String getName() {
         return name;
     }

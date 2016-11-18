@@ -12,6 +12,17 @@ import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.event.DashboardEventBus;
 import com.humancare.monitor.snmp.PatientDataManager;
 import static com.humancare.monitor.view.dashboard.DashboardView.TITLE_ID;
+import com.vaadin.addon.charts.Chart;
+import com.vaadin.addon.charts.model.AxisTitle;
+import com.vaadin.addon.charts.model.ChartType;
+import com.vaadin.addon.charts.model.Configuration;
+import com.vaadin.addon.charts.model.DataLabels;
+import com.vaadin.addon.charts.model.DataSeries;
+import com.vaadin.addon.charts.model.DataSeriesItem;
+import com.vaadin.addon.charts.model.ListSeries;
+import com.vaadin.addon.charts.model.PlotOptionsLine;
+import com.vaadin.addon.charts.model.PlotOptionsSpline;
+import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
@@ -24,9 +35,15 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import static java.lang.Math.random;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,24 +51,40 @@ import java.util.List;
  */
 public class RealTimeView extends VerticalLayout implements View {
 
-    private PatientDataManager patientDataManager;
+    private PatientDataManager patientDataManager = PatientDataManager.getInstance();
     private PatientData patientData;
     private ComboBox<RegisteredPatients> patientSelect;
+    private RealTimeCharts realTimeCharts = new RealTimeCharts();
+    private CssLayout panels;
     
     public RealTimeView(){
         
-        patientDataManager = new PatientDataManager();
         setSizeFull();
         setMargin(true);
         addStyleName("real-time");
         
-        addComponent(buildHeader());        
-        addComponent(buildSparklines());  
+        addComponent(buildHeader());  
+        //addComponent(buildSparklines());  
+        
+       // Component content = buildContent();
+        addComponent(realTimeCharts.getHeartRateChart());
+       // setExpandRatio(content, 1);
         
         initPatientSelect();
         
-    }    
- 
+    }   
+    
+    private Component buildContent() {
+        
+        panels = new CssLayout();
+        panels.addStyleName("dashboard-panels");
+        Responsive.makeResponsive(panels);
+
+        panels.addComponent(realTimeCharts.getHeartRateChart());
+
+        return panels;
+    }
+          
     private Component buildHeader() {
         HorizontalLayout header = new HorizontalLayout();
         header.addStyleName("viewheader");
@@ -72,7 +105,7 @@ public class RealTimeView extends VerticalLayout implements View {
     
     // Get all registered patients and put in combo box component
     private void initPatientSelect(){
-        List<RegisteredPatients> regPatients = patientDataManager.getRegisteredPatients();
+        List<RegisteredPatients> regPatients = patientDataManager.getPatientList();
         if(regPatients != null){
             patientSelect.setDataSource(new ListDataSource<>(regPatients));
         }

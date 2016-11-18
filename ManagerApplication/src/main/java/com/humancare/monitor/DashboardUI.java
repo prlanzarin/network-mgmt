@@ -41,7 +41,6 @@ public final class DashboardUI extends UI {
      */
     private final DataProvider dataProvider = new DummyDataProvider();
     private final DashboardEventBus dashboardEventbus = new DashboardEventBus();
-    public final static Manager MANAGER = new Manager("udp:127.0.0.1/161");
 
     @Override
     protected void init(final VaadinRequest request) {

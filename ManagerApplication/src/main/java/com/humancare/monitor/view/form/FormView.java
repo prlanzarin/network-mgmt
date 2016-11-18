@@ -27,7 +27,7 @@ import com.vaadin.ui.themes.ValoTheme;
  */
 public class FormView extends VerticalLayout implements View {
 
-    private PatientDataManager patientDataManager = new PatientDataManager();
+    private PatientDataManager patientDataManager = PatientDataManager.getInstance();
     
     public FormView() {
         setSizeFull();
