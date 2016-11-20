@@ -12,6 +12,7 @@ import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
+import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
@@ -23,6 +24,7 @@ public class SNMPManager {
 
     Snmp snmp = null;
     String address = null;
+    private int reqNumber = 1;
 
     public SNMPManager(String add) {
         address = add;
@@ -64,6 +66,7 @@ public class SNMPManager {
      */
     public String getAsString(OID oid) throws IOException {
         ResponseEvent event = get(new OID[]{oid});
+        System.out.println(event.getResponse().toString());
         return event.getResponse().get(0).getVariable().toString();
     }
 
@@ -81,6 +84,8 @@ public class SNMPManager {
             pdu.add(new VariableBinding(oid));
         }
         pdu.setType(PDU.GET);
+        pdu.setRequestID(new Integer32(reqNumber));
+        reqNumber++;
         ResponseEvent event = snmp.get(pdu, getTarget("public"));
         if (event != null) {
             return event;
@@ -102,13 +107,15 @@ public class SNMPManager {
         VariableBinding varBind = new VariableBinding(oid, var);
         pdu.add(varBind);
         pdu.setType(PDU.SET);
+        pdu.setRequestID(new Integer32(reqNumber));
+        reqNumber++;
+        event = snmp.set(pdu, getTarget("public"));
         
-        event = snmp.set(pdu, getTarget("cpublic"));
-        System.out.println("SET PDU for " + oid + " with " + var);
         if (event != null) {
+            System.out.println("SET PDU for " + oid + " with " + var);
             return event;
         }
-        throw new RuntimeException("SET timed out");
+        throw new RuntimeException("SET_TIMEOUT");
     }
     
     /**

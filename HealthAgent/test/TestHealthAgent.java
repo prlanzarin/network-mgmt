@@ -12,8 +12,10 @@ import net.percederberg.mibble.MibType;
 import net.percederberg.mibble.MibValueSymbol;
 import net.percederberg.mibble.snmp.SnmpAccess;
 import net.percederberg.mibble.snmp.SnmpObjectType;
+import org.snmp4j.PDU;
 import org.snmp4j.agent.BaseAgent;
 import org.snmp4j.agent.mo.MOScalar;
+import org.snmp4j.event.ResponseEvent;
 
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
@@ -52,9 +54,9 @@ public class TestHealthAgent {
         client = new SNMPManager("udp:127.0.0.1/2001");
         client.start();
         // Set value
-        client.set(Constants.usrName, new OctetString("Michel Temer"));
+        System.out.println(client.set(Constants.usrName, new OctetString("Michel Temer")).getResponse());
         // Get back Value which is set
-        System.out.println(client.getAsString(Constants.usrName));
+        System.out.println("GET: " + client.getAsString(Constants.usrName));
     }
 
 }

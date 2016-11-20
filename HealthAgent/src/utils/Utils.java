@@ -12,6 +12,8 @@ import net.percederberg.mibble.snmp.SnmpAccess;
 import net.percederberg.mibble.value.ObjectIdentifierValue;
 import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.MOAccessImpl;
+import org.snmp4j.smi.Gauge32;
+import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 
 public final class Utils {
@@ -50,5 +52,13 @@ public final class Utils {
             default:
                 return null;
         }
+    }
+    
+    Integer32 fakeIntegerData(OID oid) {
+        return new Integer32(3);
+    }
+    
+    Gauge32 fakeGaugeData(OID oid) {
+        return new Gauge32(3);
     }
 }
