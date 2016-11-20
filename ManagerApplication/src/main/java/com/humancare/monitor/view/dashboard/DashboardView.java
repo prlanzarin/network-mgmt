@@ -11,6 +11,7 @@ import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent
 import com.humancare.monitor.event.DashboardEventBus;
 import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
+import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.humancare.monitor.view.dashboard.DashboardEdit.DashboardEditListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
@@ -39,6 +40,8 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("serial")
@@ -55,8 +58,10 @@ public final class DashboardView extends Panel implements View,
     private Window notificationsWindow;
     
     private PatientDataManager patientDataManager = PatientDataManager.getInstance();
+    private Manager manager = Manager.getInsance();
     private PatientData patientData;
-    private ComboBox<RegisteredPatients> patientSelect;
+    private ComboBox<RegisteredPatients> patientSelect; 
+    private ComboBox<Integer> daysSelect;
     
     private int numberOfDays = 7;
     private DashboardCharts dashboardCharts;
@@ -69,7 +74,7 @@ public final class DashboardView extends Panel implements View,
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
         DashboardEventBus.register(this);
-
+        
         root = new VerticalLayout();
         root.setSizeFull();
         root.setMargin(true);
@@ -78,10 +83,6 @@ public final class DashboardView extends Panel implements View,
         Responsive.makeResponsive(root);
 
         root.addComponent(buildHeader());
-        patientDataManager.selectPatientByDate(numberOfDays);
-        
-       // root.addComponent(getHeartRateChart());
-       // root.addComponent(getTemperatureChart());
 
         Component content = buildContent();
         root.addComponent(content);
@@ -100,6 +101,42 @@ public final class DashboardView extends Panel implements View,
         
         
     }
+          
+    private Component buildDaysSelector() {
+        HorizontalLayout toolbar = new HorizontalLayout();
+        toolbar.addStyleName("daysSelector");
+        toolbar.setSpacing(true);
+        
+        List<Integer> availableDays = Arrays.asList(7, 30, 60);        
+        daysSelect = new ComboBox<>();
+        daysSelect.setDataSource(new ListDataSource<>(availableDays));
+        daysSelect.setCaption("Consulting days: ");
+        daysSelect.setHeight("30px");
+        daysSelect.setWidth("100px");
+        daysSelect.addShortcutListener(
+                new ShortcutListener("OK", KeyCode.ENTER, null) {
+                    @Override
+                    public void handleAction(final Object sender,
+                            final Object target) {
+                        numberOfDays = daysSelect.getValue();
+                    }
+                });
+
+        final Button ok = new Button("OK");
+        ok.setHeight("30px");
+        ok.setEnabled(false);
+        ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
+
+        CssLayout group = new CssLayout(daysSelect, ok);
+        group.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        toolbar.addComponent(group);
+
+        daysSelect.addSelectionListener(
+                event -> ok.setEnabled(event.getValue() != null));
+
+
+        return toolbar;
+    }
     
     // Get all registered patients and put in combo box component
     private void initPatientSelect(){
@@ -109,7 +146,6 @@ public final class DashboardView extends Panel implements View,
         }
         
     }
-          
         
     private Component buildPatientSelector() {
         HorizontalLayout toolbar = new HorizontalLayout();
@@ -118,6 +154,8 @@ public final class DashboardView extends Panel implements View,
 
         patientSelect = new ComboBox<>();
         patientSelect.setItemCaptionGenerator(RegisteredPatients::getName);
+        patientSelect.setCaption("Select Patient:  ");
+        patientSelect.setHeight("30px");
         patientSelect.addShortcutListener(
                 new ShortcutListener("OK", KeyCode.ENTER, null) {
                     @Override
@@ -128,6 +166,7 @@ public final class DashboardView extends Panel implements View,
                 });
 
         final Button ok = new Button("OK");
+        ok.setHeight("30px");
         ok.setEnabled(false);
         ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
 
@@ -144,6 +183,8 @@ public final class DashboardView extends Panel implements View,
     
     //todo: atualizar graficos apos selecionar um paciente
     private void updateCharts(RegisteredPatients regPatients){
+        manager.configManager(regPatients.getIp());
+        patientDataManager.setCurrentPatient(regPatients);
     }
     
 
@@ -158,12 +199,11 @@ public final class DashboardView extends Panel implements View,
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-        header.addComponents(titleLabel, buildPatientSelector());
+        header.addComponents(titleLabel, buildPatientSelector(), buildDaysSelector());
 
         // add notification button to header
         notificationsButton = buildNotificationsButton();
-        Component edit = buildEditButton();
-        HorizontalLayout tools = new HorizontalLayout(notificationsButton, edit);
+        HorizontalLayout tools = new HorizontalLayout(notificationsButton);
         tools.setSpacing(true);
         tools.addStyleName("toolbar");
         header.addComponent(tools);
@@ -182,24 +222,6 @@ public final class DashboardView extends Panel implements View,
         return result;
     }
 
-    private Component buildEditButton() {
-        Button result = new Button();
-        result.setId(EDIT_ID);
-        result.setIcon(FontAwesome.EDIT);
-        result.addStyleName("icon-edit");
-        result.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-        result.setDescription("Edit Dashboard");
-        result.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                getUI().addWindow(
-                        new DashboardEdit(DashboardView.this, titleLabel
-                                .getValue()));
-            }
-        });
-        return result;
-    }
-
     private Component buildContent() {
         dashboardCharts = new DashboardCharts(numberOfDays);
         
@@ -209,7 +231,13 @@ public final class DashboardView extends Panel implements View,
 
         dashboardPanels.addComponent(dashboardCharts.getHeartRateChart());
         dashboardPanels.addComponent(dashboardCharts.getTemperatureChart());
-
+        dashboardPanels.addComponent(dashboardCharts.getSPO2Chart());
+        dashboardPanels.addComponent(dashboardCharts.getPressureChart());
+        dashboardPanels.addComponent(dashboardCharts.getGlucoseChart());
+        dashboardPanels.addComponent(dashboardCharts.getEnvTempChart());
+        dashboardPanels.addComponent(dashboardCharts.getEnvTempChart());
+        dashboardPanels.addComponent(dashboardCharts.getEnvOxyChart());
+        
         return dashboardPanels;
     }
 

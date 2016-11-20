@@ -192,12 +192,12 @@ public class Manager {
             patientData.setBloodPressure(Float.parseFloat(pdu.get(8).getVariable().toString()));
             patientData.setTemperature(Float.parseFloat(pdu.get(9).getVariable().toString()));
             patientData.setHeartRate(Float.parseFloat(pdu.get(10).getVariable().toString()));
-            patientData.setBloodGlucose(Float.parseFloat(pdu.get(11).getVariable().toString()));
-            patientData.setSPO2(pdu.get(12).getVariable().toString());
-       */
+            patientData.setBloodGlucose(Float.parseFloat(pdu.get(11).getVariable().toString())); 
+            patientData.setSPO2(Integer.parseInt(pdu.get(12).getVariable().toString()));
+      */
                
             
-           patientData.setName("Teste");
+            patientData.setName("Teste");
             patientData.setAge("22");
             patientData.setGender("Feminino");
             patientData.setLatitute((float)10.6);
@@ -209,7 +209,7 @@ public class Manager {
             patientData.setTemperature((float) 36.5);
             patientData.setHeartRate(80);
             patientData.setBloodGlucose((float) 50);
-            patientData.setSPO2("10");
+            patientData.setSPO2(98);
       //  } catch (IOException ex) {
         //    ex.printStackTrace();
         //}
@@ -223,10 +223,10 @@ public class Manager {
             ResponseEvent response = get(oids);            
             PDU pdu = response.getResponse();
             
-            patientData.setEnvHumidity(pdu.get(0).getVariable().toString());
-            patientData.setEnvTemperature(pdu.get(1).getVariable().toString());
-            patientData.setEnvLuminosity(pdu.get(2).getVariable().toString());
-            patientData.setEnvOxygen(pdu.get(3).getVariable().toString());
+            patientData.setEnvHumidity(Integer.parseInt(pdu.get(0).getVariable().toString()));
+            patientData.setEnvTemperature(Integer.parseInt(pdu.get(1).getVariable().toString()));
+            patientData.setEnvLuminosity(Integer.parseInt(pdu.get(2).getVariable().toString()));
+            patientData.setEnvOxygen(Integer.parseInt(pdu.get(3).getVariable().toString()));
             patientData.setEnvAlarm(pdu.get(4).getVariable().toString().equals("SIM"));
             
         } catch (IOException ex) {
