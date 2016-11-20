@@ -37,7 +37,6 @@ public class TestSNMPManager {
          * the trap generation
          */
         SNMPManager client = new SNMPManager("udp:127.0.0.1/161");
-        client.start();
         /**
          * OID - .1.3.6.1.2.1.1.1.0 => SysDec OID - .1.3.6.1.2.1.1.5.0 =>
          * SysName => MIB explorer will be usefull here, as discussed in

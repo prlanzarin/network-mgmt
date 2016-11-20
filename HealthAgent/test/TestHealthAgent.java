@@ -24,6 +24,8 @@ import utils.Utils;
 
 public class TestHealthAgent {
 
+    private HashMap<String, HealthAgent> agents;
+
     public static void main(String[] args) throws IOException {
         TestHealthAgent client = new TestHealthAgent("udp:127.0.0.1/161");
         client.init();
@@ -52,7 +54,6 @@ public class TestHealthAgent {
         
         // Setup the client to use our newly started agent
         client = new SNMPManager("udp:127.0.0.1/2001");
-        client.start();
         // Set value
         System.out.println(client.set(Constants.usrName, new OctetString("Michel Temer")).getResponse());
         // Get back Value which is set
