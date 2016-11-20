@@ -15,6 +15,7 @@ import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.smi.Gauge32;
 import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
+import org.snmp4j.smi.Variable;
 
 public final class Utils {
     
@@ -53,12 +54,53 @@ public final class Utils {
                 return null;
         }
     }
-    
-    Integer32 fakeIntegerData(OID oid) {
-        return new Integer32(3);
+
+    public static Variable genAccelerometerData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genEnvOxygenData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genLumData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genEnvTempData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genHumidityData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genSaturationData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genGlucoseData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genLeadData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genRateData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genBdTemperatureData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genBloodPressureData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static Variable genLocationData() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    Gauge32 fakeGaugeData(OID oid) {
-        return new Gauge32(3);
-    }
 }

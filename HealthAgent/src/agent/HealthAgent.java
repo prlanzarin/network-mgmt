@@ -1,12 +1,10 @@
 package agent;
 
 import agent.model.MibContainer;
-import agent.model.ScalarMOCreator;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.concurrent.Executors;
@@ -15,8 +13,6 @@ import java.util.concurrent.TimeUnit;
 import net.percederberg.mibble.MibSymbol;
 import net.percederberg.mibble.MibType;
 import net.percederberg.mibble.MibValueSymbol;
-import net.percederberg.mibble.snmp.SnmpAccess;
-import net.percederberg.mibble.snmp.SnmpObjectType;
 
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.BaseAgent;
@@ -191,9 +187,6 @@ public class HealthAgent extends BaseAgent {
         addShutdownHook();
         getServer().addContext(new OctetString("public"));
         finishInit();
-        // Since BaseAgent registers some MIBs by default we need to unregister
-        // one before we register our own sysDescr. Normally you would
-        // override that method and register the MIBs that you need
         this.unregisterManagedObject(this.getSnmpv2MIB());
         this.setUp();
         run();
