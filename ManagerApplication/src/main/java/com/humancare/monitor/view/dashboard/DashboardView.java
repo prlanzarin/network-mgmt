@@ -75,6 +75,9 @@ public final class DashboardView extends Panel implements View,
         setSizeFull();
         DashboardEventBus.register(this);
         
+        //RegisteredPatients regPatient = new RegisteredPatients("teste", "1");
+        //patientDataManager.addPatientToMemory(regPatient);
+        
         root = new VerticalLayout();
         root.setSizeFull();
         root.setMargin(true);
@@ -113,19 +116,19 @@ public final class DashboardView extends Panel implements View,
         daysSelect.setCaption("Consulting days: ");
         daysSelect.setHeight("30px");
         daysSelect.setWidth("100px");
-        daysSelect.addShortcutListener(
-                new ShortcutListener("OK", KeyCode.ENTER, null) {
-                    @Override
-                    public void handleAction(final Object sender,
-                            final Object target) {
-                        numberOfDays = daysSelect.getValue();
-                    }
-                });
 
         final Button ok = new Button("OK");
-        ok.setHeight("30px");
         ok.setEnabled(false);
+        ok.setHeight("30px");
         ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        ok.addClickListener(new ClickListener() {
+            @Override
+            public void buttonClick(final ClickEvent event) {
+                dashboardCharts.setNumberOfDays(daysSelect.getValue());
+                dashboardCharts.filterDataByDate();
+                dashboardCharts.refreshAllGraphs();
+            }
+        });
 
         CssLayout group = new CssLayout(daysSelect, ok);
         group.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
@@ -156,20 +159,21 @@ public final class DashboardView extends Panel implements View,
         patientSelect.setItemCaptionGenerator(RegisteredPatients::getName);
         patientSelect.setCaption("Select Patient:  ");
         patientSelect.setHeight("30px");
-        patientSelect.addShortcutListener(
-                new ShortcutListener("OK", KeyCode.ENTER, null) {
-                    @Override
-                    public void handleAction(final Object sender,
-                            final Object target) {
-                        updateCharts(patientSelect.getValue());
-                    }
-                });
 
         final Button ok = new Button("OK");
-        ok.setHeight("30px");
         ok.setEnabled(false);
+        ok.setHeight("30px");
         ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
-
+        ok.addClickListener(new ClickListener() {
+            @Override
+            public void buttonClick(final ClickEvent event) {
+                manager.configManager(patientSelect.getValue().getIp());
+                patientDataManager.setCurrentPatient(patientSelect.getValue());
+                dashboardCharts.refreshAllGraphs();
+                
+            }
+        });
+               
         CssLayout group = new CssLayout(patientSelect, ok);
         group.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         toolbar.addComponent(group);
@@ -180,13 +184,6 @@ public final class DashboardView extends Panel implements View,
 
         return toolbar;
     }
-    
-    //todo: atualizar graficos apos selecionar um paciente
-    private void updateCharts(RegisteredPatients regPatients){
-        manager.configManager(regPatients.getIp());
-        patientDataManager.setCurrentPatient(regPatients);
-    }
-    
 
     private Component buildHeader() {
         HorizontalLayout header = new HorizontalLayout();

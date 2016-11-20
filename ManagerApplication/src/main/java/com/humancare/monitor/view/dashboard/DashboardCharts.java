@@ -75,7 +75,7 @@ public class DashboardCharts {
     
     public DashboardCharts(int numberOfDays){
         this.numberOfDays = numberOfDays;
-        getDataByDate();
+        filterDataByDate();
     }
     
       
@@ -399,15 +399,25 @@ public class DashboardCharts {
         } 
     }
     
+    
+    public void refreshAllGraphs(){      
+        updateGlucoseData();
+        updateHeartRatedata();
+        updatePressureData();
+        updateSPO2Data();
+        updateTemperatureData();
+        updateEnvHumidityData();
+        updateEnvOxyData();
+        updateEnvTempData();
+        
+    }
+    
     /*
     * Method gets patient data according to number of days defined by user
     */
-    public void getDataByDate(){
+    public void filterDataByDate(){
         filteredData = patientDataManager.selectPatientInfoByDate(numberOfDays);    
-    }   
-    
-    
-   
+    }       
 
     public int getNumberOfDays() {
         return numberOfDays;
