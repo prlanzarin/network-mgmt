@@ -221,6 +221,8 @@ hcSensorEntry  OBJECT-TYPE
 	::= { hcSensorTable 1 }
 
 HcSensorEntry ::= SEQUENCE {
+    sensorIndex
+        INTEGER,
 	sensorType
 		INTEGER,
 	sensorLocation
@@ -231,13 +233,21 @@ HcSensorEntry ::= SEQUENCE {
 		INTEGER
 }
 
+sensorIndex OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+		"Sensor index."
+	::= { hcSensorEntry 1 }
+
 sensorType  OBJECT-TYPE
 	SYNTAX     INTEGER
 	ACCESS     read-only
 	STATUS     mandatory
 	DESCRIPTION 
 		"Sensor's identification number which determines its type in accordance to an enumerated table."
-	::= { hcSensorEntry 1 }
+	::= { hcSensorEntry 2 }
 
 sensorLocation  OBJECT-TYPE
 	SYNTAX     OCTET STRING
@@ -245,7 +255,7 @@ sensorLocation  OBJECT-TYPE
 	STATUS     mandatory
 	DESCRIPTION 
 		"Textual description of the sector and/or location the sensor is current on and responsible for."
-	::= { hcSensorEntry 2 }
+	::= { hcSensorEntry 3 }
 
 sensorBatteryPower  OBJECT-TYPE
 	SYNTAX     Gauge
@@ -253,7 +263,7 @@ sensorBatteryPower  OBJECT-TYPE
 	STATUS     mandatory
 	DESCRIPTION 
 		"Sensor's battery level (0-100)."
-	::= { hcSensorEntry 3 }
+	::= { hcSensorEntry 4 }
 
 sensorBatteryAlert  OBJECT-TYPE
 	SYNTAX     INTEGER
@@ -261,7 +271,7 @@ sensorBatteryAlert  OBJECT-TYPE
 	STATUS     mandatory
 	DESCRIPTION 
 		"Sensor's battery alert indicator (1 - alert. 0 - normal). Should be used to enable visual feedback about the sensor's recharging need."
-	::= { hcSensorEntry 4 }
+	::= { hcSensorEntry 5 }
 
 nwType  OBJECT-TYPE
 	SYNTAX     INTEGER

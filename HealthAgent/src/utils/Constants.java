@@ -61,13 +61,14 @@ public final class Constants {
     hcSensor             OBJECT IDENTIFIER ::= { humanCare 4 }
     */
     public static final OID hcSensor = new          OID("1.3.6.1.3.57.6.4");
-    public static final OID hcSensorNumber = new    OID("1.3.6.1.3.57.6.4.1");
+    public static final OID hcSensorNumber = new    OID("1.3.6.1.3.57.6.4.1.0");
     public static final OID hcSensorTable = new     OID("1.3.6.1.3.57.6.4.2");
     public static final OID hcSensorEntry = new     OID("1.3.6.1.3.57.6.4.2.1");
-    public static final OID sensorType = new        OID("1.3.6.1.3.57.6.4.2.1.1");
-    public static final OID sensorLocation = new    OID("1.3.6.1.3.57.6.4.2.1.2");
-    public static final OID sensorBatteryPower= new OID("1.3.6.1.3.57.6.4.2.1.3");
-    public static final OID sensorBatteryAlert= new OID("1.3.6.1.3.57.6.4.2.1.4");
+    public static final OID sensorIndex = new       OID("1.3.6.1.3.57.6.4.2.1.1");
+    public static final OID sensorType = new        OID("1.3.6.1.3.57.6.4.2.1.2");
+    public static final OID sensorLocation = new    OID("1.3.6.1.3.57.6.4.2.1.3");
+    public static final OID sensorBatteryPower= new OID("1.3.6.1.3.57.6.4.2.1.4");
+    public static final OID sensorBatteryAlert= new OID("1.3.6.1.3.57.6.4.2.1.5");
  
     /*
     -- Data about the network connecting the user's agent to any kind of manager (in progress).
@@ -81,7 +82,7 @@ public final class Constants {
     static {
         Map<String, OID> aMap = new HashMap<>();
         aMap.put("1.3.6.1.3.57.6.2.4", bdHeartRhythmLeadI);
-        aMap.put("1.3.6.1.3.57.6.2.7", hcSensorTable);
+        aMap.put("1.3.6.1.3.57.6.2.7", bdBloodOxygenSaturation);
         aMap.put("1.3.6.1.3.57.6.2.6", bdBloodGlucose);
         aMap.put("1.3.6.1.3.57.6.4", hcSensor);
         aMap.put("1.3.6.1.3.57.6.4.2.1.3", sensorBatteryPower);

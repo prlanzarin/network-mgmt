@@ -1,16 +1,18 @@
 package agent;
 
 import agent.model.MibContainer;
-import agent.model.ScalarMOCreator;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.SortedSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import net.percederberg.mibble.MibSymbol;
 import net.percederberg.mibble.MibType;
 import net.percederberg.mibble.MibValueSymbol;
-import net.percederberg.mibble.snmp.SnmpAccess;
-import net.percederberg.mibble.snmp.SnmpObjectType;
 
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.BaseAgent;
@@ -38,6 +40,7 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.transport.TransportMappings;
+import utils.Constants;
 import utils.Utils;
 
 public class HealthAgent extends BaseAgent {
@@ -49,6 +52,7 @@ public class HealthAgent extends BaseAgent {
     private static final String MIB_FILE = "../HUMAN-CARE-MIB.mib";
     /* MIB MANAGEMENT CONTAINER USING MIBBLE */
     private MibContainer mib = null;
+    final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     /**
      *
@@ -64,6 +68,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds community to security name mappings needed for SNMPv1 and SNMPv2c.
+     *
      * @param communityMIB
      */
     @Override
@@ -84,6 +89,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds initial notification targets and filters.
+     *
      * @param arg0
      * @param arg1
      */
@@ -96,6 +102,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds all the necessary initial users to the USM.
+     *
      * @param arg0
      */
     @Override
@@ -106,6 +113,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Adds initial VACM configuration.
+     *
      * @param vacm
      */
     @Override
@@ -145,6 +153,7 @@ public class HealthAgent extends BaseAgent {
 
     /**
      * Clients can register the MO they need
+     *
      * @param mo
      */
     public void registerManagedObject(ManagedObject mo) {
@@ -174,57 +183,86 @@ public class HealthAgent extends BaseAgent {
      * @throws IOException
      */
     public void start() throws IOException {
-
         init();
         addShutdownHook();
         getServer().addContext(new OctetString("public"));
         finishInit();
-        run();
-        sendColdStartNotification();
-        // Since BaseAgent registers some MIBs by default we need to unregister
-        // one before we register our own sysDescr. Normally you would
-        // override that method and register the MIBs that you need
         this.unregisterManagedObject(this.getSnmpv2MIB());
         this.setUp();
+        run();
+        sendColdStartNotification();
+
+        //this.executorService.scheduleAtFixedRate(new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        generateMibData();
+        //    }
+        //}, 0, 2, TimeUnit.MILLISECONDS);
     }
-    
+
     public MibContainer getMibContainer() {
         return this.mib;
     }
-    
+
     /**
      * This method initializes the in-memory MIB at the agent
-     * 
+     *
      */
-    public void setUp() {
+    private void setUp() {
         HashMap mibMappings = mib.getMibMappings();
         SortedSet<String> mibOids = mib.getOids();
-        
+
         for (String oid : mibOids) {
             MibSymbol symbol = (MibSymbol) mibMappings.get(oid);
             MibType type = ((MibValueSymbol) symbol).getType();
 
             if (((MibValueSymbol) symbol).isScalar()) {
-                MibType syntax = ((SnmpObjectType) type).getSyntax();
-                SnmpAccess mode = ((SnmpObjectType) type).getAccess();
-
-                System.out.println("OBJECT TYPE (SCALAR) => " + syntax.getName()
-                    + " OID => " + Utils.extractSnmp4jOid(symbol) + " MODE => " + mode.toString());
-
-                MOScalar smo = ScalarMOCreator.create(Utils.extractSnmp4jOid(symbol),
-                    null, syntax.getName(), Utils.extractSnmp4jMode(mode));
-                this.registerManagedObject(smo);
-            } else if (((MibValueSymbol) symbol).isTable()) {
-                MibType syntax = ((SnmpObjectType) type).getSyntax();
-                System.out.println("OBJECT TYPE (TABLE) => " + syntax.getName());
-            } else if (((MibValueSymbol) symbol).isTableColumn()) {
-                MibType syntax = ((SnmpObjectType) type).getSyntax();
-                System.out.println("OBJECT TYPE (CLMN) => " + syntax.getName());
-            } else if (((MibValueSymbol) symbol).isTableRow()) {
-                MibType syntax = ((SnmpObjectType) type).getSyntax();
-                System.out.println("OBJECT TYPE (ROW) => " + syntax.getName());
+                mib.addScalar(symbol, type, this);
             } else {
                 System.out.println("OBJECT TYPE => " + ((MibValueSymbol) symbol).getName());
+            }
+        }
+        this.mib.addSensorTable(this);
+    }
+
+    private void generateMibData() {
+        HashMap scalarMappings = mib.getScalarMappings();
+        SortedSet<String> mibOids = mib.getOids();
+
+        Iterator entries = scalarMappings.entrySet().iterator();
+        while (entries.hasNext()) {
+            Entry thisEntry = (Entry) entries.next();
+            OID oid = (OID) thisEntry.getKey();
+            MOScalar smo = (MOScalar) thisEntry.getValue();
+            
+            if (oid.equals(Constants.bdBloodPressure)) {
+                mib.updateScalar(smo, Utils.genBloodPressureData());
+            } else if (oid.equals(Constants.usrLatitude)
+                || oid.equals(Constants.usrLongitude)) {
+                mib.updateScalar(smo, Utils.genLocationData());
+            } else if (oid.equals(Constants.usrOrientationX)
+                || oid.equals(Constants.usrOrientationY)
+                || oid.equals(Constants.usrOrientationZ)) {
+                mib.updateScalar(smo, Utils.genAccelerometerData());
+            } else if (oid.equals(Constants.bdTemperature)) {
+                mib.updateScalar(smo, Utils.genBdTemperatureData());
+            } else if (oid.equals(Constants.bdHeartRate)) {
+                mib.updateScalar(smo, Utils.genRateData());
+            } else if (oid.equals(Constants.bdHeartRhythmLeadI)
+                || oid.equals(Constants.bdHeartRhythmLeadII)) {
+                mib.updateScalar(smo, Utils.genLeadData());
+            } else if (oid.equals(Constants.bdBloodGlucose)) {
+                mib.updateScalar(smo, Utils.genGlucoseData());
+            } else if (oid.equals(Constants.bdBloodOxygenSaturation)) {
+                mib.updateScalar(smo, Utils.genSaturationData());
+            } else if (oid.equals(Constants.envHumidity)) {
+                mib.updateScalar(smo, Utils.genHumidityData());
+            } else if (oid.equals(Constants.envTemperature)) {
+                mib.updateScalar(smo, Utils.genEnvTempData());
+            } else if (oid.equals(Constants.envLuminosity)) {
+                mib.updateScalar(smo, Utils.genLumData());
+            } else if (oid.equals(Constants.envOxygen)) {
+                mib.updateScalar(smo, Utils.genEnvOxygenData());
             }
         }
     }
