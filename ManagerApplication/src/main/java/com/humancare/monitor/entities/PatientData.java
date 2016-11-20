@@ -24,16 +24,16 @@ public class PatientData {
     private float bloodPressure;
     private float bloodGlucose;
     private float heartRate;
-    private String SPO2;
+    private int SPO2;
     private float latitute;
     private float longitude;
     private float x;
     private float y;
     private float z;
-    private String envHumidity;
-    private String envTemperature;
-    private String envLuminosity;
-    private String envOxygen;
+    private int envHumidity;
+    private int envTemperature;
+    private int envLuminosity;
+    private int envOxygen;
     private boolean envAlarm;
     private int numberOfSensors;
     private List<Sensor> sensorsList;
@@ -108,11 +108,11 @@ public class PatientData {
         this.heartRate = heartRate;
     }
 
-    public String getSPO2() {
+    public int getSPO2() {
         return SPO2;
     }
 
-    public void setSPO2(String SPO2) {
+    public void setSPO2(int SPO2) {
         this.SPO2 = SPO2;
     }
 
@@ -156,35 +156,35 @@ public class PatientData {
         this.z = z;
     }
 
-    public String getEnvHumidity() {
+    public int getEnvHumidity() {
         return envHumidity;
     }
 
-    public void setEnvHumidity(String envHumidity) {
+    public void setEnvHumidity(int envHumidity) {
         this.envHumidity = envHumidity;
     }
 
-    public String getEnvTemperature() {
+    public int getEnvTemperature() {
         return envTemperature;
     }
 
-    public void setEnvTemperature(String envTemperature) {
+    public void setEnvTemperature(int envTemperature) {
         this.envTemperature = envTemperature;
     }
 
-    public String getEnvLuminosity() {
+    public int getEnvLuminosity() {
         return envLuminosity;
     }
 
-    public void setEnvLuminosity(String envLuminosity) {
+    public void setEnvLuminosity(int envLuminosity) {
         this.envLuminosity = envLuminosity;
     }
 
-    public String getEnvOxygen() {
+    public int getEnvOxygen() {
         return envOxygen;
     }
 
-    public void setEnvOxygen(String envOxygen) {
+    public void setEnvOxygen(int envOxygen) {
         this.envOxygen = envOxygen;
     }
 

@@ -13,6 +13,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -28,6 +29,7 @@ import com.vaadin.ui.themes.ValoTheme;
 public class FormView extends VerticalLayout implements View {
 
     private PatientDataManager patientDataManager = PatientDataManager.getInstance();
+    private CssLayout panels;
     
     public FormView() {
         setSizeFull();
@@ -35,7 +37,10 @@ public class FormView extends VerticalLayout implements View {
         addStyleName("form");       
 
         addComponent(buildHeader());
-        addComponent(buildForm());
+        
+        Component content = buildContent();
+        addComponent(content);
+        setExpandRatio(content, 1);
         
     }
     
@@ -54,6 +59,17 @@ public class FormView extends VerticalLayout implements View {
 
         return header;
     
+    }
+    
+    private Component buildContent() {
+        
+        panels = new CssLayout();
+        panels.addStyleName("dashboard-panels");
+        Responsive.makeResponsive(panels);
+
+        panels.addComponent(buildForm());
+
+        return panels;
     }
     private Component buildForm(){
         

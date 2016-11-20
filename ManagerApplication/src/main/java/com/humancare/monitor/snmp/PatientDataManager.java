@@ -93,7 +93,8 @@ public class PatientDataManager {
     *
     * @param numberOfDays -  7 (weekly chart), 30 (monthly), ..
     */
-    public List<PatientData> selectPatientByDate(int numberOfDays){     
+    public List<PatientData> selectPatientInfoByDate(int numberOfDays){     
+        // excluir linha abaixo - para testes
         getAllPatientInfo();
         List<PatientData> filteredList = new ArrayList<PatientData>();
         
