@@ -7,6 +7,7 @@ package com.humancare.monitor.snmp;
 
 import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
+import com.humancare.monitor.entities.Sensor;
 import static com.humancare.monitor.snmp.Manager.OID_S;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
@@ -36,6 +37,7 @@ public class PatientDataManager {
     
     private OID ENV_OIDS[] = {OID_S.get("envHumidity"), OID_S.get("envTemperature"), OID_S.get("envLuminosity"), OID_S.get("envOxygen"), OID_S.get("envAlarm")}; 
     private OID NET_OIDS[] = {OID_S.get("nwType"), OID_S.get("nwSpeed")};
+    private OID SENSOR_OIDS[] = {OID_S.get("sensorType"), OID_S.get("sensorLocation"), OID_S.get("sensorBatteryPower"), OID_S.get("sensorBatteryAlert")};
     
     private PatientData patientData = new PatientData();
     
@@ -59,6 +61,10 @@ public class PatientDataManager {
         return instance;
     }
         
+    public String getByOID(OID oid){
+        return MANAGER.getAsString(oid);
+    }
+    
     // TODO: avaliar parametros necessarios
     public PatientData getAllPatientInfo(){
         patientData = MANAGER.getAllPatientInformation(PATIENT_INFO_OIDS);
@@ -76,7 +82,12 @@ public class PatientDataManager {
     public PatientData getNetInfo(){
         patientData = MANAGER.getNetInformation(NET_OIDS, patientData);
         return patientData;    
-    }    
+    }  
+    
+    public List<Sensor> getSensors(int maxRepetitions){
+        return MANAGER.getSensorInformation(SENSOR_OIDS, maxRepetitions);         
+    
+    }
     
     public void addPatientToMemory(RegisteredPatients regPatient){
         if(registPatientList == null){
@@ -95,7 +106,7 @@ public class PatientDataManager {
     */
     public List<PatientData> selectPatientInfoByDate(int numberOfDays){     
         // excluir linha abaixo - para testes
-        getAllPatientInfo();
+        // getAllPatientInfo();
         List<PatientData> filteredList = new ArrayList<PatientData>();
         
         Calendar cal = Calendar.getInstance();

@@ -14,7 +14,7 @@ public class Sensor {
     private String type;
     private String location;
     private int batteryPower;
-    private String batteryAlert;
+    private int batteryAlert;
 
     public String getType() {
         return type;
@@ -40,15 +40,13 @@ public class Sensor {
         this.batteryPower = batteryPower;
     }
 
-    public String getBatteryAlert() {
+    public int getBatteryAlert() {
         return batteryAlert;
     }
 
-    public void setBatteryAlert(String batteryAlert) {
+    public void setBatteryAlert(int batteryAlert) {
         this.batteryAlert = batteryAlert;
     }
-    
-    
-    
+        
     
 }

@@ -6,11 +6,12 @@
 package com.humancare.monitor.snmp;
 
 import com.humancare.monitor.entities.PatientData;
+import com.humancare.monitor.entities.Sensor;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
@@ -34,7 +35,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
  */
 public class Manager {
 
-    private static Manager instance = null;
+    private static Manager instance = null;    
     private Snmp snmp = null;
     private String address = null;    
     private static int requestID = 1;
@@ -50,12 +51,9 @@ public class Manager {
     }
     
     public void configManager(String add) {
-         address = add;
-         try {           
-            //Manager client = new Manager("udp:127.0.0.1/161");
-            instance.start();
-         } catch (IOException ex) {
-            ex.printStackTrace();        }
+        address = add; 
+        //Manager client = new Manager("udp:127.0.0.1/161");
+        instance.start();
     
     }
 
@@ -66,11 +64,15 @@ public class Manager {
      *
      * @throws IOException
      */
-    void start() throws IOException {
-        TransportMapping transport = new DefaultUdpTransportMapping();
-        snmp = new Snmp(transport);
-        // Do not forget this line!
-        transport.listen();
+    void start(){
+        try {
+            TransportMapping transport = new DefaultUdpTransportMapping();
+            snmp = new Snmp(transport);
+            // Do not forget this line!
+            transport.listen();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -79,10 +81,14 @@ public class Manager {
      *
      * @param oid
      * @return
-     * @throws IOException
      */
-    public String getAsString(OID oid) throws IOException {
-        ResponseEvent event = get(new OID[]{oid});
+    public String getAsString(OID oid) {
+        ResponseEvent event = null;
+        try {
+            event = get(new OID[]{oid});            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         return event.getResponse().get(0).getVariable().toString();
     }
 
@@ -103,9 +109,35 @@ public class Manager {
         if (event != null) {
             return event;
         }
+        
         throw new RuntimeException("GET timed out");
     }
     
+    /**
+     * This method is capable of handling multiple OIDs and read multiple lines
+     *
+     * @param oids
+     * @param maxRepetitions 
+     * @return
+     * @throws IOException
+     */
+    public ResponseEvent getBulk(OID oids[], int maxRepetitions) throws IOException {
+        PDU pdu = new PDU();
+        for (OID oid : oids) {
+            pdu.add(new VariableBinding(oid));
+        }
+        pdu.setType(PDU.GETBULK);
+        pdu.setMaxRepetitions(maxRepetitions);
+        pdu.setNonRepeaters(0);
+        
+        ResponseEvent event = snmp.send(pdu, getTarget(), null);
+        if (event != null) {
+            return event;
+        }
+        
+        throw new RuntimeException("GET timed out");
+    }
+        
     
     /**
      * This method is set a mib octet string value according to its oid
@@ -175,10 +207,10 @@ public class Manager {
     public PatientData getAllPatientInformation(OID[] oids){
         
         PatientData patientData = new PatientData();
-    //    try {
+        try {
             patientData.setReceivedDateAndTime(System.currentTimeMillis());
             
-    /*         ResponseEvent response = get(oids);
+            ResponseEvent response = get(oids);
             
             PDU pdu = response.getResponse();
             patientData.setName(pdu.get(0).getVariable().toString());
@@ -194,25 +226,16 @@ public class Manager {
             patientData.setHeartRate(Float.parseFloat(pdu.get(10).getVariable().toString()));
             patientData.setBloodGlucose(Float.parseFloat(pdu.get(11).getVariable().toString())); 
             patientData.setSPO2(Integer.parseInt(pdu.get(12).getVariable().toString()));
-      */
-               
-            
-            patientData.setName("Teste");
-            patientData.setAge("22");
-            patientData.setGender("Feminino");
-            patientData.setLatitute((float)10.6);
-            patientData.setLongitude((float)-50.3);
-            patientData.setX((float) 2.6);
-            patientData.setY((float) 5.6);
-            patientData.setZ((float) 8);
-            patientData.setBloodPressure((float) 11.3);
-            patientData.setTemperature((float) 36.5);
-            patientData.setHeartRate(80);
-            patientData.setBloodGlucose((float) 50);
-            patientData.setSPO2(98);
-      //  } catch (IOException ex) {
-        //    ex.printStackTrace();
-        //}
+      
+        } catch (RuntimeException ex) {
+            System.out.println("Connection time out");
+            ex.printStackTrace();
+            return null;
+        }catch (IOException ex) {
+            System.out.println("Error to find patient information");
+            ex.printStackTrace();
+            return null;
+        }
     
         return patientData;
     }
@@ -229,8 +252,12 @@ public class Manager {
             patientData.setEnvOxygen(Integer.parseInt(pdu.get(3).getVariable().toString()));
             patientData.setEnvAlarm(pdu.get(4).getVariable().toString().equals("SIM"));
             
+        }  catch (RuntimeException ex) {
+            System.out.println("Connection time out");
+            ex.printStackTrace();
+            return null;
         } catch (IOException ex) {
-            System.out.println("Erro ao buscar informações de ambiente");
+            System.out.println("Error to find envoriment information");
             ex.printStackTrace();
             return null;
         }
@@ -238,25 +265,54 @@ public class Manager {
         return patientData;
     }
     
-    PatientData getNetInformation(OID[] oids, PatientData patientData) {
+    public PatientData getNetInformation(OID[] oids, PatientData patientData) {
         try {
             
             ResponseEvent response = get(oids);            
             PDU pdu = response.getResponse();
-            
             patientData.setNwType(pdu.get(0).getVariable().toString());
             patientData.setNwSpeed(pdu.get(1).getVariable().toString());
             
+        }  catch (RuntimeException ex) {
+            System.out.println("Connection time out");
+            ex.printStackTrace();
+            return null;
         } catch (IOException ex) {
-            System.out.println("Erro ao buscar informações de rede");
+            System.out.println("Error to find network information");
             ex.printStackTrace();
             return null;
         }
     
         return patientData;
+    }     
+    
+    public List<Sensor> getSensorInformation(OID[] oids, int maxRepetitions) {
+        List<Sensor> sensorList = new ArrayList<Sensor>();
+        try {
+            ResponseEvent response = getBulk(oids, maxRepetitions);
+            PDU pdu = response.getResponse();
+            int j = 0;
+            for(int i=0; i<maxRepetitions; i++){
+                Sensor sensor = new Sensor();
+                sensor.setType(pdu.get(j++).getVariable().toString());
+                sensor.setLocation(pdu.get(j++).getVariable().toString());
+                sensor.setBatteryPower(Integer.parseInt(pdu.get(j++).getVariable().toString()));
+                sensor.setBatteryAlert(Integer.parseInt(pdu.get(j++).getVariable().toString()));
+                
+                sensorList.add(sensor);            
+            }
+            
+        }  catch (RuntimeException ex) {
+            System.out.println("Connection time out");
+            ex.printStackTrace();
+            return null;
+        }catch (IOException ex) {
+            System.out.println("Erro ao buscar informaçoes de sensores");
+            ex.printStackTrace();
+            return null;
+        }
+        return sensorList;
     }
-    
-    
     
     public static final Map<String, OID> OID_S = new HashMap<String, OID>() {{
         put("humanCare", new OID(".1.3.6.1.3.57.6"));

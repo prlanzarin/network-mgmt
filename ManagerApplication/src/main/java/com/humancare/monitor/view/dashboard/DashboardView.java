@@ -11,13 +11,13 @@ import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent
 import com.humancare.monitor.event.DashboardEventBus;
 import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
+import com.humancare.monitor.entities.Sensor;
 import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.humancare.monitor.view.dashboard.DashboardEdit.DashboardEditListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
@@ -77,6 +77,8 @@ public final class DashboardView extends Panel implements View,
         
         //RegisteredPatients regPatient = new RegisteredPatients("teste", "1");
         //patientDataManager.addPatientToMemory(regPatient);
+        
+        manager.configManager("127.0.0.1");
         
         root = new VerticalLayout();
         root.setSizeFull();
