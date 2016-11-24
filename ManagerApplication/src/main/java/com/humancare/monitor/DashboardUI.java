@@ -29,7 +29,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 @Theme("dashboard")
 @Widgetset("com.humancare.monitor.DashboardWidgetSet")
-@Title("QuickTickets Dashboard")
+@Title("Human Monitor Dashboard")
 @SuppressWarnings("serial")
 public final class DashboardUI extends UI {
 

@@ -9,6 +9,7 @@ import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.entities.Sensor;
 import static com.humancare.monitor.snmp.Manager.OID_S;
+import com.humancare.monitor.view.dashboard.DashboardView;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
@@ -94,7 +95,8 @@ public class PatientDataManager {
             registPatientList = new ArrayList<RegisteredPatients>();
         }
         
-        registPatientList.add(regPatient);        
+        registPatientList.add(regPatient);  
+        
         
     }
     
@@ -132,7 +134,8 @@ public class PatientDataManager {
     // Add new agent calling set function in Manager for each oid
     // TODO: improve call
     public void addPatientToMib(FormLayout form){
-        String name = null, ip = null;
+        String name = null, ip = null, gender = null;
+        Integer age = null;
         for(Component c : form) {
             if(c instanceof TextField) {
                 TextField f = (TextField) c;               
@@ -146,14 +149,21 @@ public class PatientDataManager {
                 }else{
                     ip = f.getValue();
                 }
+                
                 if(f.getId().equals("usrName")){
                     name = f.getValue();
-                }                
+                }else                
+                if(f.getId().equals("usrAge")){
+                    age = Integer.parseInt(f.getValue());
+                }else                
+                if(f.getId().equals("usrGender")){
+                    gender = f.getValue();
+                } 
             }
         }
         
         // add patient to application memory with its ip
-        RegisteredPatients regPatient = new RegisteredPatients(name, ip);
+        RegisteredPatients regPatient = new RegisteredPatients(name, ip, age, gender);
         addPatientToMemory(regPatient);
     }
 

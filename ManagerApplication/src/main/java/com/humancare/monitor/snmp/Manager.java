@@ -216,15 +216,15 @@ public class Manager {
             patientData.setName(pdu.get(0).getVariable().toString());
             patientData.setAge(pdu.get(1).getVariable().toString());
             patientData.setGender(pdu.get(2).getVariable().toString());
-            patientData.setLatitute(Float.parseFloat(pdu.get(3).getVariable().toString()));
-            patientData.setLongitude(Float.parseFloat(pdu.get(4).getVariable().toString()));
-            patientData.setX(Float.parseFloat(pdu.get(5).getVariable().toString()));
-            patientData.setY(Float.parseFloat(pdu.get(6).getVariable().toString()));
-            patientData.setZ(Float.parseFloat(pdu.get(7).getVariable().toString()));
-            patientData.setBloodPressure(Float.parseFloat(pdu.get(8).getVariable().toString()));
-            patientData.setTemperature(Float.parseFloat(pdu.get(9).getVariable().toString()));
-            patientData.setHeartRate(Float.parseFloat(pdu.get(10).getVariable().toString()));
-            patientData.setBloodGlucose(Float.parseFloat(pdu.get(11).getVariable().toString())); 
+            patientData.setLatitute(Double.parseDouble(pdu.get(3).getVariable().toString()));
+            patientData.setLongitude(Double.parseDouble(pdu.get(4).getVariable().toString()));
+            patientData.setX(Double.parseDouble(pdu.get(5).getVariable().toString()));
+            patientData.setY(Double.parseDouble(pdu.get(6).getVariable().toString()));
+            patientData.setZ(Double.parseDouble(pdu.get(7).getVariable().toString()));
+            patientData.setBloodPressure(Integer.parseInt(pdu.get(8).getVariable().toString()));
+            patientData.setTemperature(Double.parseDouble(pdu.get(9).getVariable().toString())/10.0);
+            patientData.setHeartRate(Double.parseDouble(pdu.get(10).getVariable().toString()));
+            patientData.setBloodGlucose(Integer.parseInt(pdu.get(11).getVariable().toString())); 
             patientData.setSPO2(Integer.parseInt(pdu.get(12).getVariable().toString()));
       
         } catch (RuntimeException ex) {

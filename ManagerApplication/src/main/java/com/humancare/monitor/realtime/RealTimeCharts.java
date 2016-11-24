@@ -5,18 +5,40 @@
  */
 package com.humancare.monitor.realtime;
 
+import static com.humancare.monitor.snmp.Manager.OID_S;
+import com.humancare.monitor.snmp.PatientDataManager;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisTitle;
 import com.vaadin.addon.charts.model.AxisType;
+import com.vaadin.addon.charts.model.Background;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
+import com.vaadin.addon.charts.model.DataLabels;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.DateTimeLabelFormats;
+import com.vaadin.addon.charts.model.Labels;
+import com.vaadin.addon.charts.model.ListSeries;
+import com.vaadin.addon.charts.model.Pane;
+import com.vaadin.addon.charts.model.PlotOptionsSolidgauge;
 import com.vaadin.addon.charts.model.PlotOptionsSpline;
+import com.vaadin.addon.charts.model.SeriesTooltip;
+import com.vaadin.addon.charts.model.Stop;
 import com.vaadin.addon.charts.model.YAxis;
+import com.vaadin.addon.charts.model.style.SolidColor;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -28,50 +50,274 @@ import java.util.logging.Logger;
  */
 public class RealTimeCharts {
     
+    private final int UPDATE_INTERVAL_TIME = 1000;
+    PatientDataManager patientDataManager = PatientDataManager.getInstance();
+    
+     // Heart Rate Chart attributes
+    private Chart heartRatechart;
+    private Configuration configurationHR;
+    private DataSeries hrData;    
+        
+    
+    protected Component getTemperaturePanel() {
+        CssLayout panel = new CssLayout();
+        HorizontalLayout horizontalLayout1 = new HorizontalLayout();
+        VerticalLayout horizontalLayout2 = new VerticalLayout();
+        
+        Label valuelb = new Label("0");
+        valuelb.setId("g_value");
+        valuelb.setHeight("60px");
+        valuelb.addStyleName(ValoTheme.LABEL_H1);
+        valuelb.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        valuelb.addStyleName(ValoTheme.LABEL_COLORED);
+        
+        Label symbollb = new Label();
+        symbollb.setId("g_value");
+        symbollb.setCaption("ºC");
+        
+        Label time = new Label();
+        time.setId("time");
+        time.setValue("Last Update:");
+        
+        new Thread(){
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");   
+            
+            public void run(){
+                try {
+                    while(true){                    
+                    Thread.sleep(1000);   
+                    Date resultdate = new Date(System.currentTimeMillis());
+                    // Double temperature = Integer.parseInt(patientDataManager.getByOID(OID_S.get("temperature"))) / 10.0;
+                    Double temperature = 370/10.0;
+                    /*
+                    * validation - notification
+                    */                    
+                    valuelb.setValue(temperature.toString());
+                    time.setValue("Last update: " + sdf.format(resultdate));
+                    Thread.sleep(1000); 
+                    }
+                } catch (InterruptedException ex) {                    
+                    System.out.println("Thread stopped");
+                    ex.printStackTrace();
+                }
+            }
+        }.start();
+        
+        horizontalLayout1.addComponents(valuelb, symbollb);
+        horizontalLayout2.addComponent(time);
+        
+        panel.addComponent(horizontalLayout1);
+        panel.addComponent(horizontalLayout2);
+        
+        return panel;
+    }
+    
+    protected Component getSPO2Panel() {
+        CssLayout panel = new CssLayout();
+        HorizontalLayout horizontalLayout1 = new HorizontalLayout();
+        VerticalLayout horizontalLayout2 = new VerticalLayout();
+        
+        Label valuelb = new Label("0");
+        valuelb.setId("g_value");
+        valuelb.setHeight("60px");
+        valuelb.addStyleName(ValoTheme.LABEL_H1);
+        valuelb.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        valuelb.addStyleName(ValoTheme.LABEL_COLORED);
+        
+        Label symbollb = new Label();
+        symbollb.setId("g_value");
+        symbollb.setCaption("% SpO2");
+        
+        Label time = new Label();
+        time.setId("time");
+        time.setValue("Last Update:");
+                
+        new Thread(){
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");   
+            
+            public void run(){
+                try {
+                    while(true){                    
+                    Thread.sleep(1000);   
+                    Date resultdate = new Date(System.currentTimeMillis());
+                    //Integer spo2 = Integer.parseInt(patientDataManager.getByOID(OID_S.get("spo2")));
+                    Integer spo2 = 98;
+                    /*
+                    * validation - notification
+                    */                    
+                    valuelb.setValue(spo2.toString());
+                    time.setValue("Last update: " + sdf.format(resultdate));
+                    Thread.sleep(1000); 
+                    }
+                } catch (InterruptedException ex) {                    
+                    System.out.println("Thread stopped");
+                    ex.printStackTrace();
+                }
+            }
+        }.start();
+        
+        horizontalLayout1.addComponents(valuelb, symbollb);
+        horizontalLayout2.addComponent(time);
+        
+        panel.addComponent(horizontalLayout1);
+        panel.addComponent(horizontalLayout2);
+        
+        return panel;
+    }
+    
+    protected Component getPressurePanel() {
+        CssLayout panel = new CssLayout();
+        HorizontalLayout horizontalLayout1 = new HorizontalLayout();
+        VerticalLayout horizontalLayout2 = new VerticalLayout();
+        
+        Label valuelb = new Label("0");
+        valuelb.setId("g_value");
+        valuelb.setHeight("60px");
+        valuelb.addStyleName(ValoTheme.LABEL_H1);
+        valuelb.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        valuelb.addStyleName(ValoTheme.LABEL_COLORED);
+        
+        Label symbollb = new Label();
+        symbollb.setId("g_value");
+        symbollb.setCaption("mmHg");
+        
+        Label time = new Label();
+        time.setId("time");
+        time.setValue("Last Update:");
+                
+        new Thread(){
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");   
+            
+            public void run(){
+                try {
+                    while(true){                    
+                    Thread.sleep(1000);   
+                    Date resultdate = new Date(System.currentTimeMillis());
+                    //Integer pressure = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodPressure")));
+                    /*
+                    * validation - notification
+                    */        
+                    Integer pressure = 12080;
+                    String formatPressure = pressure.toString().substring(0, 3) +"/" + pressure.toString().substring(3,5);
+                    valuelb.setValue(formatPressure);
+                    time.setValue("Last update: " + sdf.format(resultdate));
+                    Thread.sleep(1000); 
+                    }
+                } catch (InterruptedException ex) {                    
+                    System.out.println("Thread stopped");
+                    ex.printStackTrace();
+                }
+            }
+        }.start();
+        
+        horizontalLayout1.addComponents(valuelb, symbollb);
+        horizontalLayout2.addComponent(time);
+        
+        panel.addComponent(horizontalLayout1);
+        panel.addComponent(horizontalLayout2);
+        
+        return panel;
+    }
+    
+    protected Component getGlucosePanel() {
+        CssLayout panel = new CssLayout();
+        HorizontalLayout horizontalLayout1 = new HorizontalLayout();
+        VerticalLayout horizontalLayout2 = new VerticalLayout();
+        
+        Label valuelb = new Label("0");
+        valuelb.setId("g_value");
+        valuelb.setHeight("60px");
+        valuelb.addStyleName(ValoTheme.LABEL_H1);
+        valuelb.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        valuelb.addStyleName(ValoTheme.LABEL_COLORED);
+        
+        Label symbollb = new Label();
+        symbollb.setId("g_value");
+        symbollb.setCaption("mg/dL");
+        
+        Label time = new Label();
+        time.setId("time");
+        time.setValue("Last Update:");
+                
+        new Thread(){
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");   
+            
+            public void run(){
+                try {
+                    while(true){                    
+                    Thread.sleep(1000);   
+                    Date resultdate = new Date(System.currentTimeMillis());
+                    //Integer glucose = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodGlucose")));
+                    Integer glucose = 250;
+                    /*
+                    * validation - notification
+                    */                    
+                    valuelb.setValue(glucose.toString());
+                    time.setValue("Last update: " + sdf.format(resultdate));
+                    Thread.sleep(1000); 
+                    }
+                } catch (InterruptedException ex) {                    
+                    System.out.println("Thread stopped");
+                    ex.printStackTrace();
+                }
+            }
+        }.start();
+        
+        horizontalLayout1.addComponents(valuelb, symbollb);
+        horizontalLayout2.addComponent(time);
+        
+        panel.addComponent(horizontalLayout1);
+        panel.addComponent(horizontalLayout2);
+        
+        return panel;
+    }
+    
     // TODO:GET REAL DATA E TUDO MAIS
     protected Component getHeartRateChart() {
-        Chart chart = new Chart();
-        chart.setHeight("400px");
-        chart.setWidth("30%");
+        heartRatechart = new Chart();
+        heartRatechart.setHeight("250px");
+        heartRatechart.setWidth("33%");
+        
+        configurationHR = heartRatechart.getConfiguration();
+        configurationHR.getChart().setType(ChartType.SPLINE);
+        configurationHR.getTitle().setText(
+                "Heart Rate");
+        configurationHR.getTooltip().setFormatter("");
+        configurationHR.getxAxis().setType(AxisType.DATETIME);
+        // format is: Hour Date of week
+        configurationHR.getxAxis().setDateTimeLabelFormats(
+                new DateTimeLabelFormats("%H %a", "%H"));
+        //configuration.getTooltip().setXDateFormat("%d.%m. %Y %H:%M");
 
-        Configuration configuration = chart.getConfiguration();
-        configuration.getChart().setType(ChartType.SPLINE);
-
-        configuration.getTitle().setText("Heart Rate");
-        configuration.getSubTitle().setText("");
-        configuration.getTooltip().setFormatter("");
-        configuration.getxAxis().setType(AxisType.DATETIME);
-        configuration.getxAxis().setDateTimeLabelFormats(
-                new DateTimeLabelFormats("%H:%m", "%H"));
-
-        YAxis yAxis = configuration.getyAxis();
+        YAxis yAxis = configurationHR.getyAxis();
         yAxis.setTitle(new AxisTitle("Heart Rate (bpm)"));
+        yAxis.setMin(0);
 
-        configuration.getTooltip().setFormatter(
-                        "'<b>'+ this.series.name +'</b><br/>\'+ Highcharts.dateFormat('%H:%m', this.x) +': '+ this.y +' bpm'");        
+        configurationHR.getTooltip().setFormatter(
+                        "'<b>'+ this.series.name +'</b><br/>\'+ Highcharts.dateFormat('%H %a', this.x) +': '+ this.y +' bpm'");
         
 
-        final DataSeries series = new DataSeries();
-        series.setPlotOptions(new PlotOptionsSpline());
-        series.setName("Teste");
+        hrData = new DataSeries();
+        hrData.setPlotOptions(new PlotOptionsSpline());
+        hrData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
         for (int i = 0; i <= 10; i++) {
-            series.add(new DataSeriesItem(
-                    System.currentTimeMillis() + i * 1000,  Math.random()));
+            hrData.add(new DataSeriesItem(System.currentTimeMillis(), 0));
         }
-        runWhileAttached(chart, new Runnable() {
+        runWhileAttached(heartRatechart, new Runnable() {
             @Override
             public void run() {
-                final long x = System.currentTimeMillis();
-                final double y = Math.random();
-                series.add(new DataSeriesItem(x, y), true, true);
+                //int heartValue = Integer.parseInt(patientDataManager.getByOID(OID_S.get("heartRate")));
+                double heartValue =Math.random();
+                hrData.add(new DataSeriesItem(System.currentTimeMillis(), heartValue), true, true);
             }
         }, 1000, 1000);
 
-        configuration.setSeries(series);
+        configurationHR.setSeries(hrData);
 
-        chart.drawChart(configuration);
-        return chart;
+        heartRatechart.drawChart(configurationHR);
+        return heartRatechart;
     }
+
     
     /**
      * Runs given task repeatedly until the reference component is attached

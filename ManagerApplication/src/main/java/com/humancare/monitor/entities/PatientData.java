@@ -20,16 +20,16 @@ public class PatientData {
     private String name;
     private String age;
     private String gender;
-    private float temperature;
-    private float bloodPressure;
-    private float bloodGlucose;
-    private float heartRate;
+    private double temperature;
+    private int bloodPressure;
+    private int bloodGlucose;
+    private double heartRate;
     private int SPO2;
-    private float latitute;
-    private float longitude;
-    private float x;
-    private float y;
-    private float z;
+    private double latitute;
+    private double longitude;
+    private double x;
+    private double y;
+    private double z;
     private int envHumidity;
     private int envTemperature;
     private int envLuminosity;
@@ -76,35 +76,35 @@ public class PatientData {
         this.gender = gender;
     }
 
-    public float getTemperature() {
+    public double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(float temperature) {
+    public void setTemperature(double temperature) {
         this.temperature = temperature;
     }
 
-    public float getBloodPressure() {
+    public int getBloodPressure() {
         return bloodPressure;
     }
 
-    public void setBloodPressure(float bloodPressure) {
+    public void setBloodPressure(int bloodPressure) {
         this.bloodPressure = bloodPressure;
     }
 
-    public float getBloodGlucose() {
+    public int getBloodGlucose() {
         return bloodGlucose;
     }
 
-    public void setBloodGlucose(float bloodGlucose) {
+    public void setBloodGlucose(int bloodGlucose) {
         this.bloodGlucose = bloodGlucose;
     }
 
-    public float getHeartRate() {
+    public double getHeartRate() {
         return heartRate;
     }
 
-    public void setHeartRate(float heartRate) {
+    public void setHeartRate(double heartRate) {
         this.heartRate = heartRate;
     }
 
@@ -116,43 +116,43 @@ public class PatientData {
         this.SPO2 = SPO2;
     }
 
-    public float getLatitute() {
+    public double getLatitute() {
         return latitute;
     }
 
-    public void setLatitute(float latitute) {
+    public void setLatitute(double latitute) {
         this.latitute = latitute;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public float getX() {
+    public double getX() {
         return x;
     }
 
-    public void setX(float x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public float getY() {
+    public double getY() {
         return y;
     }
 
-    public void setY(float y) {
+    public void setY(double y) {
         this.y = y;
     }
 
-    public float getZ() {
+    public double getZ() {
         return z;
     }
 
-    public void setZ(float z) {
+    public void setZ(double z) {
         this.z = z;
     }
 
