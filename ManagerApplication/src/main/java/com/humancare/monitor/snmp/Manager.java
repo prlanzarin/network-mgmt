@@ -223,7 +223,7 @@ public class Manager {
             patientData.setZ(Double.parseDouble(pdu.get(7).getVariable().toString()));
             patientData.setBloodPressure(Integer.parseInt(pdu.get(8).getVariable().toString()));
             patientData.setTemperature(Double.parseDouble(pdu.get(9).getVariable().toString())/10.0);
-            patientData.setHeartRate(Double.parseDouble(pdu.get(10).getVariable().toString()));
+            patientData.setHeartRate(Integer.parseInt(pdu.get(10).getVariable().toString()));
             patientData.setBloodGlucose(Integer.parseInt(pdu.get(11).getVariable().toString())); 
             patientData.setSPO2(Integer.parseInt(pdu.get(12).getVariable().toString()));
       

@@ -9,18 +9,15 @@ import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.entities.Sensor;
 import static com.humancare.monitor.snmp.Manager.OID_S;
-import com.humancare.monitor.view.dashboard.DashboardView;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import org.snmp4j.smi.OID;
 
 /*
@@ -118,11 +115,12 @@ public class PatientDataManager {
         
         if(!patientDB.isEmpty()){
             for(PatientData p : patientDB){
-               // if(currentPatient.getName().equals(p.getName())){   -- isso ou fazer mapa <nome, objeto do paciente>
-                Calendar temp = Calendar.getInstance();
-                temp.setTime(p.getReceivedDateAndTime());
-                if(temp.after(cal)){
-                    filteredList.add(p);
+                if(currentPatient.getName().equals(p.getName())){   //-- isso ou fazer mapa <nome, objeto do paciente>
+                    Calendar temp = Calendar.getInstance();
+                    temp.setTime(p.getReceivedDateAndTime());
+                    if(temp.after(cal)){
+                        filteredList.add(p);
+                    }   
                 }
             }
         }

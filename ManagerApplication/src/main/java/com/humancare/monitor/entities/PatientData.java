@@ -9,10 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author amanda
- */
 public class PatientData {   
    
     private String ip;
@@ -23,7 +19,7 @@ public class PatientData {
     private double temperature;
     private int bloodPressure;
     private int bloodGlucose;
-    private double heartRate;
+    private int heartRate;
     private int SPO2;
     private double latitute;
     private double longitude;
@@ -39,8 +35,8 @@ public class PatientData {
     private List<Sensor> sensorsList;
     private String nwType;
     private String nwSpeed;
-    private Date receivedDateAndTime;
-
+    private Date receivedDateAndTime;   
+    
     public Date getReceivedDateAndTime() {
         return receivedDateAndTime;
     }
@@ -100,11 +96,11 @@ public class PatientData {
         this.bloodGlucose = bloodGlucose;
     }
 
-    public double getHeartRate() {
+    public int getHeartRate() {
         return heartRate;
     }
 
-    public void setHeartRate(double heartRate) {
+    public void setHeartRate(int heartRate) {
         this.heartRate = heartRate;
     }
 
@@ -235,6 +231,7 @@ public class PatientData {
     public void setIp(String ip) {
         this.ip = ip;
     }
+    
 
     @Override
     public String toString() {

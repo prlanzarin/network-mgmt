@@ -7,6 +7,7 @@ package com.humancare.monitor.realtime;
 
 import static com.humancare.monitor.snmp.Manager.OID_S;
 import com.humancare.monitor.snmp.PatientDataManager;
+import com.humancare.monitor.snmp.PatientDataValidator;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisTitle;
 import com.vaadin.addon.charts.model.AxisType;
@@ -52,6 +53,7 @@ public class RealTimeCharts {
     
     private final int UPDATE_INTERVAL_TIME = 1000;
     PatientDataManager patientDataManager = PatientDataManager.getInstance();
+    PatientDataValidator validate = new PatientDataValidator();
     
      // Heart Rate Chart attributes
     private Chart heartRatechart;
@@ -89,9 +91,15 @@ public class RealTimeCharts {
                     Date resultdate = new Date(System.currentTimeMillis());
                     // Double temperature = Integer.parseInt(patientDataManager.getByOID(OID_S.get("temperature"))) / 10.0;
                     Double temperature = 370/10.0;
-                    /*
-                    * validation - notification
-                    */                    
+                    
+                    if(validate.tempAlert(temperature)){
+                        patientDataManager.getCurrentPatient().addTempAlertList(resultdate);
+                        
+                        /*
+                        * notification
+                        */
+                    }    
+                    
                     valuelb.setValue(temperature.toString());
                     time.setValue("Last update: " + sdf.format(resultdate));
                     Thread.sleep(1000); 
@@ -142,9 +150,14 @@ public class RealTimeCharts {
                     Date resultdate = new Date(System.currentTimeMillis());
                     //Integer spo2 = Integer.parseInt(patientDataManager.getByOID(OID_S.get("spo2")));
                     Integer spo2 = 98;
-                    /*
-                    * validation - notification
-                    */                    
+                    
+                    if(validate.spo2Alert(spo2)){
+                        patientDataManager.getCurrentPatient().addSpo2AlertList(resultdate);
+                        
+                        /*
+                        * notification
+                        */
+                    }
                     valuelb.setValue(spo2.toString());
                     time.setValue("Last update: " + sdf.format(resultdate));
                     Thread.sleep(1000); 
@@ -193,12 +206,20 @@ public class RealTimeCharts {
                     while(true){                    
                     Thread.sleep(1000);   
                     Date resultdate = new Date(System.currentTimeMillis());
-                    //Integer pressure = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodPressure")));
-                    /*
-                    * validation - notification
-                    */        
-                    Integer pressure = 12080;
-                    String formatPressure = pressure.toString().substring(0, 3) +"/" + pressure.toString().substring(3,5);
+                    //String pressure = patientDataManager.getByOID(OID_S.get("bloodPressure"));
+                    String pressure = "12080";
+                    int sistolic = Integer.parseInt(pressure.substring(0, 3));
+                    int diastolic = Integer.parseInt(pressure.substring(3, 5));
+                    
+                    if(validate.pressureAlert(sistolic, diastolic)){
+                        patientDataManager.getCurrentPatient().addPressureAlertList(resultdate);
+                        
+                        /*
+                        * notification
+                        */
+                    }                    
+                    
+                    String formatPressure = sistolic +"/" + diastolic;
                     valuelb.setValue(formatPressure);
                     time.setValue("Last update: " + sdf.format(resultdate));
                     Thread.sleep(1000); 
@@ -249,9 +270,14 @@ public class RealTimeCharts {
                     Date resultdate = new Date(System.currentTimeMillis());
                     //Integer glucose = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodGlucose")));
                     Integer glucose = 250;
-                    /*
-                    * validation - notification
-                    */                    
+                    
+                    if(validate.glucoseAlert(glucose)){
+                        patientDataManager.getCurrentPatient().addGlucoseAlertList(resultdate);
+                        
+                        /*
+                        * notification
+                        */
+                    }                   
                     valuelb.setValue(glucose.toString());
                     time.setValue("Last update: " + sdf.format(resultdate));
                     Thread.sleep(1000); 
@@ -307,8 +333,17 @@ public class RealTimeCharts {
             @Override
             public void run() {
                 //int heartValue = Integer.parseInt(patientDataManager.getByOID(OID_S.get("heartRate")));
-                double heartValue =Math.random();
-                hrData.add(new DataSeriesItem(System.currentTimeMillis(), heartValue), true, true);
+                int heartValue = 80;
+                Long time = System.currentTimeMillis();
+                hrData.add(new DataSeriesItem(time, heartValue), true, true);
+                
+                if(validate.heartRateAlert(heartValue)){
+                    patientDataManager.getCurrentPatient().addHeartRateAlertList(new Date(time));
+
+                    /*
+                    * notification
+                    */
+                }   
             }
         }, 1000, 1000);
 
