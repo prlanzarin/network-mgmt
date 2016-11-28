@@ -9,6 +9,7 @@ import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.entities.Sensor;
 import static com.humancare.monitor.snmp.Manager.OID_S;
+import com.humancare.monitor.view.dashboard.DashboardCharts;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
@@ -46,6 +47,9 @@ public class PatientDataManager {
     
     // list of patients registered by manager
     private List<RegisteredPatients> registPatientList;
+    
+    private int femPatientsNumber;
+    private int malePatientsNumber;
     
     private Manager MANAGER = Manager.getInsance();   
     
@@ -94,6 +98,8 @@ public class PatientDataManager {
         
         registPatientList.add(regPatient);  
         
+        DashboardCharts updateCharts = DashboardCharts.getInstance();
+        updateCharts.initPatientSelect();
         
     }
     
@@ -165,6 +171,22 @@ public class PatientDataManager {
         addPatientToMemory(regPatient);
     }
 
+    public void calcGenderStatistic(){
+        femPatientsNumber = 0;
+        malePatientsNumber = 0;
+        
+        if(registPatientList != null){
+            for(RegisteredPatients p : registPatientList){
+                if(p.getGender().equals("F"))
+                    femPatientsNumber++;
+                else
+                    malePatientsNumber++;
+            }
+        }
+       
+    }
+    
+    
     public RegisteredPatients getCurrentPatient() {
         return currentPatient;
     }
@@ -179,6 +201,22 @@ public class PatientDataManager {
 
     public void setPatientList(List<RegisteredPatients> patientList) {
         registPatientList = patientList;
+    }
+
+    public int getFemPatientsNumber() {
+        return femPatientsNumber;
+    }
+
+    public void setFemPatientsNumber(int femPatientsNumber) {
+        this.femPatientsNumber = femPatientsNumber;
+    }
+
+    public int getMalePatientsNumber() {
+        return malePatientsNumber;
+    }
+
+    public void setMalePatientsNumber(int malePatientsNumber) {
+        this.malePatientsNumber = malePatientsNumber;
     }
     
     

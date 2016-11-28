@@ -5,41 +5,27 @@
  */
 package com.humancare.monitor.realtime;
 
-import static com.humancare.monitor.snmp.Manager.OID_S;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.humancare.monitor.snmp.PatientDataValidator;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisTitle;
 import com.vaadin.addon.charts.model.AxisType;
-import com.vaadin.addon.charts.model.Background;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
-import com.vaadin.addon.charts.model.DataLabels;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.DateTimeLabelFormats;
-import com.vaadin.addon.charts.model.Labels;
-import com.vaadin.addon.charts.model.ListSeries;
-import com.vaadin.addon.charts.model.Pane;
-import com.vaadin.addon.charts.model.PlotOptionsSolidgauge;
 import com.vaadin.addon.charts.model.PlotOptionsSpline;
-import com.vaadin.addon.charts.model.SeriesTooltip;
-import com.vaadin.addon.charts.model.Stop;
 import com.vaadin.addon.charts.model.YAxis;
-import com.vaadin.addon.charts.model.style.SolidColor;
-import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -93,8 +79,9 @@ public class RealTimeCharts {
                     Double temperature = 370/10.0;
                     
                     if(validate.tempAlert(temperature)){
-                        patientDataManager.getCurrentPatient().addTempAlertList(resultdate);
-                        
+                        if(patientDataManager.getCurrentPatient() != null){
+                            patientDataManager.getCurrentPatient().addTempAlertList(resultdate);
+                        }
                         /*
                         * notification
                         */
@@ -152,8 +139,9 @@ public class RealTimeCharts {
                     Integer spo2 = 98;
                     
                     if(validate.spo2Alert(spo2)){
-                        patientDataManager.getCurrentPatient().addSpo2AlertList(resultdate);
-                        
+                        if(patientDataManager.getCurrentPatient() != null){
+                            patientDataManager.getCurrentPatient().addSpo2AlertList(resultdate);
+                        }
                         /*
                         * notification
                         */
@@ -212,8 +200,9 @@ public class RealTimeCharts {
                     int diastolic = Integer.parseInt(pressure.substring(3, 5));
                     
                     if(validate.pressureAlert(sistolic, diastolic)){
-                        patientDataManager.getCurrentPatient().addPressureAlertList(resultdate);
-                        
+                        if(patientDataManager.getCurrentPatient() != null){
+                            patientDataManager.getCurrentPatient().addPressureAlertList(resultdate);
+                        }
                         /*
                         * notification
                         */
@@ -272,8 +261,9 @@ public class RealTimeCharts {
                     Integer glucose = 250;
                     
                     if(validate.glucoseAlert(glucose)){
-                        patientDataManager.getCurrentPatient().addGlucoseAlertList(resultdate);
-                        
+                        if(patientDataManager.getCurrentPatient() != null){
+                            patientDataManager.getCurrentPatient().addGlucoseAlertList(resultdate);
+                        }
                         /*
                         * notification
                         */
@@ -338,7 +328,9 @@ public class RealTimeCharts {
                 hrData.add(new DataSeriesItem(time, heartValue), true, true);
                 
                 if(validate.heartRateAlert(heartValue)){
-                    patientDataManager.getCurrentPatient().addHeartRateAlertList(new Date(time));
+                    if(patientDataManager.getCurrentPatient() != null){
+                        patientDataManager.getCurrentPatient().addHeartRateAlertList(new Date(time));
+                    }
 
                     /*
                     * notification

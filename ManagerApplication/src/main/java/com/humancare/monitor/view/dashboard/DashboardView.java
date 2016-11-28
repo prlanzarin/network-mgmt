@@ -60,11 +60,12 @@ public final class DashboardView extends Panel implements View,
     private PatientDataManager patientDataManager = PatientDataManager.getInstance();
     private Manager manager = Manager.getInsance();
     private PatientData patientData;
-    private ComboBox<RegisteredPatients> patientSelect; 
+   
     private ComboBox<Integer> daysSelect;
     
     private int numberOfDays = 7;
-    private DashboardCharts dashboardCharts;
+    private DashboardCharts dashboardCharts = DashboardCharts.getInstance();
+    
     
      
     // TODO: atributo e campo para definir numero de dias que deseja-se obter nos graficos 
@@ -75,10 +76,10 @@ public final class DashboardView extends Panel implements View,
         setSizeFull();
         DashboardEventBus.register(this);
         
-        //RegisteredPatients regPatient = new RegisteredPatients("teste", "1");
-        //patientDataManager.addPatientToMemory(regPatient);
-        
         manager.configManager("127.0.0.1");
+        
+        dashboardCharts.setNumberOfDays(numberOfDays);
+        dashboardCharts.filterDataByDate();
         
         root = new VerticalLayout();
         root.setSizeFull();
@@ -93,7 +94,7 @@ public final class DashboardView extends Panel implements View,
         root.addComponent(content);
         root.setExpandRatio(content, 1);
         
-        initPatientSelect();
+        dashboardCharts.initPatientSelect();
 
         // All the open sub-windows should be closed whenever the root layout
         // gets clicked.
@@ -106,7 +107,32 @@ public final class DashboardView extends Panel implements View,
         
         
     }
-          
+   
+    private Component buildHeader() {
+        
+        HorizontalLayout header = new HorizontalLayout();
+        header.addStyleName("viewheader");
+        header.setSpacing(true);
+
+        // add title and combo box to header
+        titleLabel = new Label("Human Monitor");
+        titleLabel.setId(TITLE_ID);
+        titleLabel.setSizeUndefined();
+        titleLabel.addStyleName(ValoTheme.LABEL_H1);
+        titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
+        header.addComponents(titleLabel, dashboardCharts.buildPatientSelector(), buildDaysSelector());
+
+        // add notification button to header
+        notificationsButton = buildNotificationsButton();
+        HorizontalLayout tools = new HorizontalLayout(notificationsButton);
+        tools.setSpacing(true);
+        tools.addStyleName("toolbar");
+        header.addComponent(tools);
+
+        return header;
+    }
+
+     // Build component used to select the days which charts will be represented          
     private Component buildDaysSelector() {
         HorizontalLayout toolbar = new HorizontalLayout();
         toolbar.addStyleName("daysSelector");
@@ -143,73 +169,6 @@ public final class DashboardView extends Panel implements View,
         return toolbar;
     }
     
-    // Get all registered patients and put in combo box component
-    private void initPatientSelect(){
-        List<RegisteredPatients> regPatients = patientDataManager.getPatientList();
-        if(regPatients != null){
-            patientSelect.setDataSource(new ListDataSource<>(regPatients));
-        }
-        
-    }
-        
-    private Component buildPatientSelector() {
-        HorizontalLayout toolbar = new HorizontalLayout();
-        toolbar.addStyleName("patientSelector");
-        toolbar.setSpacing(true);
-
-        patientSelect = new ComboBox<>();
-        patientSelect.setItemCaptionGenerator(RegisteredPatients::getName);
-        patientSelect.setCaption("Select Patient:  ");
-        patientSelect.setHeight("30px");
-
-        final Button ok = new Button("OK");
-        ok.setEnabled(false);
-        ok.setHeight("30px");
-        ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        ok.addClickListener(new ClickListener() {
-            @Override
-            public void buttonClick(final ClickEvent event) {
-                manager.configManager(patientSelect.getValue().getIp());
-                patientDataManager.setCurrentPatient(patientSelect.getValue());
-                dashboardCharts.refreshAllGraphs();
-                
-            }
-        });
-               
-        CssLayout group = new CssLayout(patientSelect, ok);
-        group.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-        toolbar.addComponent(group);
-
-        patientSelect.addSelectionListener(
-                event -> ok.setEnabled(event.getValue() != null));
-
-
-        return toolbar;
-    }
-
-    private Component buildHeader() {
-        HorizontalLayout header = new HorizontalLayout();
-        header.addStyleName("viewheader");
-        header.setSpacing(true);
-
-        // add title and combo box to header
-        titleLabel = new Label("Human Monitor");
-        titleLabel.setId(TITLE_ID);
-        titleLabel.setSizeUndefined();
-        titleLabel.addStyleName(ValoTheme.LABEL_H1);
-        titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-        header.addComponents(titleLabel, buildPatientSelector(), buildDaysSelector());
-
-        // add notification button to header
-        notificationsButton = buildNotificationsButton();
-        HorizontalLayout tools = new HorizontalLayout(notificationsButton);
-        tools.setSpacing(true);
-        tools.addStyleName("toolbar");
-        header.addComponent(tools);
-
-        return header;
-    }
-
     private NotificationsButton buildNotificationsButton() {
         NotificationsButton result = new NotificationsButton();
         result.addClickListener(new ClickListener() {
@@ -221,8 +180,7 @@ public final class DashboardView extends Panel implements View,
         return result;
     }
 
-    private Component buildContent() {
-        dashboardCharts = new DashboardCharts(numberOfDays);
+    private Component buildContent() {       
         
         dashboardPanels = new CssLayout();
         dashboardPanels.addStyleName("dashboard-panels");
@@ -238,68 +196,6 @@ public final class DashboardView extends Panel implements View,
         dashboardPanels.addComponent(dashboardCharts.getEnvOxyChart());
         
         return dashboardPanels;
-    }
-
-  
-
-    private Component createContentWrapper(final Component content) {
-        final CssLayout slot = new CssLayout();
-        slot.setWidth("100%");
-        slot.addStyleName("dashboard-panel-slot");
-
-        CssLayout card = new CssLayout();
-        card.setWidth("100%");
-        card.addStyleName(ValoTheme.LAYOUT_CARD);
-
-        HorizontalLayout toolbar = new HorizontalLayout();
-        toolbar.addStyleName("dashboard-panel-toolbar");
-        toolbar.setWidth("100%");
-
-        Label caption = new Label(content.getCaption());
-        caption.addStyleName(ValoTheme.LABEL_H4);
-        caption.addStyleName(ValoTheme.LABEL_COLORED);
-        caption.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-        content.setCaption(null);
-
-        MenuBar tools = new MenuBar();
-        tools.addStyleName(ValoTheme.MENUBAR_BORDERLESS);
-        MenuItem max = tools.addItem("", FontAwesome.EXPAND, new Command() {
-
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                if (!slot.getStyleName().contains("max")) {
-                    selectedItem.setIcon(FontAwesome.COMPRESS);
-                    toggleMaximized(slot, true);
-                } else {
-                    slot.removeStyleName("max");
-                    selectedItem.setIcon(FontAwesome.EXPAND);
-                    toggleMaximized(slot, false);
-                }
-            }
-        });
-        max.setStyleName("icon-only");
-        MenuItem root = tools.addItem("", FontAwesome.COG, null);
-        root.addItem("Configure", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                Notification.show("Not implemented in this demo");
-            }
-        });
-        root.addSeparator();
-        root.addItem("Close", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                Notification.show("Not implemented in this demo");
-            }
-        });
-
-        toolbar.addComponents(caption, tools);
-        toolbar.setExpandRatio(caption, 1);
-        toolbar.setComponentAlignment(caption, Alignment.MIDDLE_LEFT);
-
-        card.addComponents(toolbar, content);
-        slot.addComponent(card);
-        return slot;
     }
 
     private void openNotificationsPopup(final ClickEvent event) {

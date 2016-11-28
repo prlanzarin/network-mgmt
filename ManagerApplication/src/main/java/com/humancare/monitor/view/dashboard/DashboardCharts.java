@@ -6,6 +6,8 @@
 package com.humancare.monitor.view.dashboard;
 
 import com.humancare.monitor.entities.PatientData;
+import com.humancare.monitor.entities.RegisteredPatients;
+import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisTitle;
@@ -17,7 +19,13 @@ import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.DateTimeLabelFormats;
 import com.vaadin.addon.charts.model.PlotOptionsSpline;
 import com.vaadin.addon.charts.model.YAxis;
+import com.vaadin.server.data.ListDataSource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.List;
 
 /**
@@ -72,12 +80,63 @@ public class DashboardCharts {
     // General attributes
     private int numberOfDays;
     private List<PatientData> filteredData;
+    private ComboBox<RegisteredPatients> patientSelect; 
+    private Manager manager = Manager.getInsance();
     
-    public DashboardCharts(int numberOfDays){
-        this.numberOfDays = numberOfDays;
-        filterDataByDate();
+    private static DashboardCharts instance = null;
+    
+    public static DashboardCharts getInstance(){
+        if(instance == null){
+            instance = new DashboardCharts();
+        }           
+        return instance;
     }
     
+    protected DashboardCharts(){}
+    
+    // Build select component to list all registered patients
+    // When patient is selected, graphs are updated    
+    public Component buildPatientSelector() {
+        HorizontalLayout toolbar = new HorizontalLayout();
+        toolbar.addStyleName("patientSelector");
+        toolbar.setSpacing(true);
+
+        patientSelect = new ComboBox<>();
+        patientSelect.setItemCaptionGenerator(RegisteredPatients::getName);
+        patientSelect.setCaption("Select Patient:  ");
+        patientSelect.setHeight("30px");
+
+        final Button ok = new Button("OK");
+        ok.setEnabled(false);
+        ok.setHeight("30px");
+        ok.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        ok.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(final Button.ClickEvent event) {
+                manager.configManager(patientSelect.getValue().getIp());
+                patientDataManager.setCurrentPatient(patientSelect.getValue());
+                filterDataByDate();
+                refreshAllGraphs();
+                               
+            }
+        });
+               
+        CssLayout group = new CssLayout(patientSelect, ok);
+        group.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        toolbar.addComponent(group);
+
+        patientSelect.addSelectionListener(
+                event -> ok.setEnabled(event.getValue() != null));        
+        return toolbar;
+    }
+    
+    // Get all registered patients and put in combo box component
+    public void initPatientSelect(){
+        List<RegisteredPatients> regPatients = patientDataManager.getPatientList();
+        if(regPatients != null){
+            patientSelect.setDataSource(new ListDataSource<>(regPatients));
+        }        
+    }
       
     protected Component getTemperatureChart() {
         temperatureChart = new Chart();
@@ -101,8 +160,8 @@ public class DashboardCharts {
         temperatureData = new DataSeries();
         temperatureData.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
-        temperatureData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        temperatureData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");        
+        // insert values according to filtered data (by days)
         updateTemperatureData();
         
         temperatureConfig.addSeries(temperatureData);
@@ -144,8 +203,8 @@ public class DashboardCharts {
         hrData = new DataSeries();
         hrData.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
-        hrData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        hrData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");        
+        // insert values according to filtered data (by days)
         updateHeartRatedata();
         
         configurationHR.addSeries(hrData);
@@ -188,7 +247,7 @@ public class DashboardCharts {
         spo2Data.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
         spo2Data.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        // insert values according to filtered data (by days)
         updateSPO2Data();
         
         spo2Config.addSeries(spo2Data);
@@ -227,7 +286,7 @@ public class DashboardCharts {
         pressureData.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
         pressureData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        // insert values according to filtered data (by days)
         updatePressureData();
         
         pressureConfig.addSeries(pressureData);
@@ -266,7 +325,7 @@ public class DashboardCharts {
         glucoseData.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
         glucoseData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        // insert values according to filtered data (by days)
         updateGlucoseData();
         
         glucoseConfig.addSeries(glucoseData);
@@ -305,7 +364,7 @@ public class DashboardCharts {
         envTempData.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
         envTempData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        // insert values according to filtered data (by days)
         updateEnvTempData();
         
         envTempConfig.addSeries(envTempData);
@@ -344,7 +403,7 @@ public class DashboardCharts {
         envHumidityData.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
         envHumidityData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        // insert values according to filtered data (by days)
         updateEnvHumidityData();
         
         envHumidityConfig.addSeries(envHumidityData);
@@ -383,7 +442,7 @@ public class DashboardCharts {
         envOxyData.setPlotOptions(new PlotOptionsSpline());
         // TODO: pegar primeiro da lista se estiver null
         envOxyData.setName(patientDataManager.getCurrentPatient() != null ? patientDataManager.getCurrentPatient().getName() : "NO patient selected");
-        
+        // insert values according to filtered data (by days)
         updateEnvOxyData();
         
         envOxyConfig.addSeries(envOxyData);
@@ -400,7 +459,7 @@ public class DashboardCharts {
     }
     
     
-    public void refreshAllGraphs(){      
+    public void refreshAllGraphs(){    
         updateGlucoseData();
         updateHeartRatedata();
         updatePressureData();
@@ -427,7 +486,5 @@ public class DashboardCharts {
         this.numberOfDays = numberOfDays;
     }
     
-    
-
     
 }
