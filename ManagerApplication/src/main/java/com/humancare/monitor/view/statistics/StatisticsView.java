@@ -79,6 +79,7 @@ public class StatisticsView extends Panel implements View {
         statisticsPanels.addComponent(h1);
         statisticsPanels.addComponent(h2);
         statisticsPanels.addComponent(h3);
+        statisticsPanels.addComponent(charts.buildTable());
         return statisticsPanels;
     }
     

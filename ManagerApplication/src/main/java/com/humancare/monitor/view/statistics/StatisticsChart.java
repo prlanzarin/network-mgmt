@@ -23,6 +23,8 @@ import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.ui.Grid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -39,7 +41,8 @@ public class StatisticsChart {
     private List<RegisteredPatients> patientWithSpo2Alert = new ArrayList<RegisteredPatients>();
     
     public StatisticsChart(){
-        RegisteredPatients  p =  new RegisteredPatients("teste", "10", 80, "F");
+        // TESTES
+      /*  RegisteredPatients  p =  new RegisteredPatients("teste", "10", 80, "F");
         p.addPressureAlertList(new Date(System.currentTimeMillis()));
         p.addHeartRateAlertList(new Date(System.currentTimeMillis()));
         patientDataManager.addPatientToMemory(p);
@@ -53,7 +56,7 @@ public class StatisticsChart {
         patientDataManager.addPatientToMemory(p);
         p =  new RegisteredPatients("teste2", "10", 75, "F");
         p.addHeartRateAlertList(new Date(System.currentTimeMillis()));
-        patientDataManager.addPatientToMemory(p);
+        patientDataManager.addPatientToMemory(p);*/
         
         populatePatientAlertList();
         
@@ -62,30 +65,31 @@ public class StatisticsChart {
     
     public void populatePatientAlertList(){
         // sort by age
-        Collections.sort(patientDataManager.getPatientList());
-        
-        for(RegisteredPatients p: patientDataManager.getPatientList()){
-            System.out.println(p.getAge());
-            if(!p.getGlucoseAlertFrequency().isEmpty()){
-                patientWithGlucoseAlert.add(p);
-            }
+        if(patientDataManager.getPatientList() != null){
+            Collections.sort(patientDataManager.getPatientList());
             
-            if(!p.getHeartRateALertFrequency().isEmpty()){
-                patientWithHeartAlert.add(p);
+            for(RegisteredPatients p: patientDataManager.getPatientList()){
+                System.out.println(p.getAge());
+                if(!p.getGlucoseAlertFrequency().isEmpty()){
+                    patientWithGlucoseAlert.add(p);
+                }
+
+                if(!p.getHeartRateALertFrequency().isEmpty()){
+                    patientWithHeartAlert.add(p);
+                }
+
+                if(!p.getPressureAlertFrequency().isEmpty()){
+                    patientWithPressureAlert.add(p);
+                }
+
+                if(!p.getSpo2AlertFrequency().isEmpty()){
+                    patientWithSpo2Alert.add(p);
+                }
+
+                if(!p.getTemperatureAlertFrequency().isEmpty()){
+                    patientWithTemperatureAlert.add(p);
+                }    
             }
-            
-            if(!p.getPressureAlertFrequency().isEmpty()){
-                patientWithPressureAlert.add(p);
-            }
-            
-            if(!p.getSpo2AlertFrequency().isEmpty()){
-                patientWithSpo2Alert.add(p);
-            }
-            
-            if(!p.getTemperatureAlertFrequency().isEmpty()){
-                patientWithTemperatureAlert.add(p);
-            }        
-        
         }
     }
     
@@ -396,6 +400,30 @@ public class StatisticsChart {
         
         averageSpo2Config.addSeries(series);
         return chart;
+    }
+    
+    public Component buildTable(){
+        Grid grid = new Grid();
+        grid.setWidth("100%");
+        // Define columns
+        grid.addColumn("Name", String.class);
+        grid.addColumn("Gender", String.class);
+        grid.addColumn("Age", Integer.class);        
+        grid.addColumn("Heart Rate Alerts", Integer.class);     
+        grid.addColumn("Temperature Alerts", Integer.class);  
+        grid.addColumn("Pressure Alerts", Integer.class);  
+        grid.addColumn("Glucose Alerts", Integer.class);  
+        grid.addColumn("SpO2 Alerts", Integer.class);  
+        grid.addColumn("IP", String.class);
+        
+     
+        if(patientDataManager.getPatientList() != null && !patientDataManager.getPatientList().isEmpty()){
+            for(RegisteredPatients p : patientDataManager.getPatientList()){
+                grid.addRow(p.getName(), p.getGender(), p.getAge(), p.getHeartRateALertFrequency().size(), p.getTemperatureAlertFrequency().size(),
+                        p.getPressureAlertFrequency().size(), p.getGlucoseAlertFrequency().size(), p.getSpo2AlertFrequency().size(), p.getIp());
+            }
+        }  
+        return grid;
     }
 
 }
