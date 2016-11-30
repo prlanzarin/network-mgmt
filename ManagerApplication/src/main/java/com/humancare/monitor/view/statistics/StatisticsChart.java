@@ -23,21 +23,81 @@ import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 
 public class StatisticsChart {
     
     private PatientDataManager patientDataManager = PatientDataManager.getInstance();
-    private Configuration ageConfig;
+    private List<RegisteredPatients> patientWithHeartAlert = new ArrayList<RegisteredPatients>();
+    private List<RegisteredPatients> patientWithGlucoseAlert = new ArrayList<RegisteredPatients>();
+    private List<RegisteredPatients> patientWithPressureAlert = new ArrayList<RegisteredPatients>();
+    private List<RegisteredPatients> patientWithTemperatureAlert = new ArrayList<RegisteredPatients>();
+    private List<RegisteredPatients> patientWithSpo2Alert = new ArrayList<RegisteredPatients>();
     
-    // genero
+    public StatisticsChart(){
+        RegisteredPatients  p =  new RegisteredPatients("teste", "10", 80, "F");
+        p.addPressureAlertList(new Date(System.currentTimeMillis()));
+        p.addHeartRateAlertList(new Date(System.currentTimeMillis()));
+        patientDataManager.addPatientToMemory(p);
+        
+        p =  new RegisteredPatients("teste2", "10", 70, "F");
+        p.addHeartRateAlertList(new Date(System.currentTimeMillis()));
+        patientDataManager.addPatientToMemory(p);
+        
+         p =  new RegisteredPatients("teste2", "10", 72, "F");
+        p.addHeartRateAlertList(new Date(System.currentTimeMillis()));
+        patientDataManager.addPatientToMemory(p);
+        p =  new RegisteredPatients("teste2", "10", 75, "F");
+        p.addHeartRateAlertList(new Date(System.currentTimeMillis()));
+        patientDataManager.addPatientToMemory(p);
+        
+        populatePatientAlertList();
+        
+    
+    }
+    
+    public void populatePatientAlertList(){
+        // sort by age
+        Collections.sort(patientDataManager.getPatientList());
+        
+        for(RegisteredPatients p: patientDataManager.getPatientList()){
+            System.out.println(p.getAge());
+            if(!p.getGlucoseAlertFrequency().isEmpty()){
+                patientWithGlucoseAlert.add(p);
+            }
+            
+            if(!p.getHeartRateALertFrequency().isEmpty()){
+                patientWithHeartAlert.add(p);
+            }
+            
+            if(!p.getPressureAlertFrequency().isEmpty()){
+                patientWithPressureAlert.add(p);
+            }
+            
+            if(!p.getSpo2AlertFrequency().isEmpty()){
+                patientWithSpo2Alert.add(p);
+            }
+            
+            if(!p.getTemperatureAlertFrequency().isEmpty()){
+                patientWithTemperatureAlert.add(p);
+            }        
+        
+        }
+    }
+    
+    /*
+    *  Chart of patient distribution by gender
+    */
     public Component genderChart() {
         Chart chart = new Chart(ChartType.PIE);
-        chart.setHeight("350px");
-        chart.setWidth("33%");
+        chart.setHeight("300px");
+        chart.setWidth("500px");
 
         Configuration conf = chart.getConfiguration();
-
         conf.setTitle("Gender Distribution");
 
         PlotOptionsPie plotOptions = new PlotOptionsPie();
@@ -64,71 +124,278 @@ public class StatisticsChart {
         });
 
         chart.drawChart(conf);
-
         return chart;
     }
     
-    // idades
-  /*  public Component getAgeDistChart() {
+    /*
+    *  Chart to show average heart rate alert distribution by age
+    */
+    public Component getAverageHeartRateAlertChart() {        
+        
         Chart chart = new Chart(ChartType.COLUMN);
-        chart.setHeight("350px");
-        chart.setWidth("33%");
+        chart.setHeight("300px");
+        chart.setWidth("500px");
 
-
-        ageConfig = chart.getConfiguration();
-
-        ageConfig.setTitle("Age Distribution");
-        ageConfig.getLegend().setEnabled(false);
+        Configuration averageHRConfig = chart.getConfiguration();
+        averageHRConfig.setTitle("Average Age-Heart Rate Alert");
+        averageHRConfig.getLegend().setEnabled(false);
 
         XAxis x = new XAxis();
         x.setType(AxisType.CATEGORY);
-        ageConfig.addxAxis(x);
+        averageHRConfig.addxAxis(x);
 
         YAxis y = new YAxis();
-        y.setTitle("Total percent market share");
-        ageConfig.addyAxis(y);
+        y.setTitle("Number of alerts");
+        averageHRConfig.addyAxis(y);
 
         PlotOptionsColumn column = new PlotOptionsColumn();
         column.setCursor(Cursor.POINTER);
         column.setDataLabels(new DataLabels(true));
 
-        ageConfig.setPlotOptions(column);
+        averageHRConfig.setPlotOptions(column);
+        averageHRConfig.getTooltip().setFormatter(
+                        "'<b>'+ this.point.name +' years old: </b><br/>\'+ this.y +' alerts'");
+
+        DataSeries series = new DataSeries();
+        PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
+        plotOptionsColumn.setColorByPoint(true);
+        series.setPlotOptions(plotOptionsColumn);       
+        
+        DataSeriesItem item;
+        Integer newValue = 0, lastValue = 0, lastAge = 0;
+        
+        for(RegisteredPatients p : patientWithHeartAlert){
+            newValue = p.getHeartRateALertFrequency().size();            
+            // calculates average
+            if(p.getAge().equals(lastAge)){
+                newValue = (p.getHeartRateALertFrequency().size() + lastValue)/2;
+            }            
+            item = new DataSeriesItem(p.getAge().toString(), newValue);
+            series.addItemWithDrilldown(item);
+            
+            lastValue = newValue;
+            lastAge = p.getAge();            
+        }
+        
+        averageHRConfig.addSeries(series);
+        return chart;
+    }
+    
+    /*
+    *  Chart to show average temperature alert distribution by age
+    */
+    public Component getAverageTemperatureAlertChart() {        
+        
+        Chart chart = new Chart(ChartType.COLUMN);
+        chart.setHeight("300px");
+        chart.setWidth("500px");
+
+        Configuration averageTemperature = chart.getConfiguration();
+        averageTemperature.setTitle("Average Age-Temperature Alert");
+        averageTemperature.getLegend().setEnabled(false);
+
+        XAxis x = new XAxis();
+        x.setType(AxisType.CATEGORY);
+        averageTemperature.addxAxis(x);
+
+        YAxis y = new YAxis();
+        y.setTitle("Number of alerts");
+        averageTemperature.addyAxis(y);
+
+        PlotOptionsColumn column = new PlotOptionsColumn();
+        column.setCursor(Cursor.POINTER);
+        column.setDataLabels(new DataLabels(true));
+
+        averageTemperature.setPlotOptions(column);
+        averageTemperature.getTooltip().setFormatter(
+                        "'<b>'+ this.point.name +' years old: </b><br/>\'+ this.y +' alerts'");
 
         DataSeries series = new DataSeries();
         PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
         plotOptionsColumn.setColorByPoint(true);
         series.setPlotOptions(plotOptionsColumn);
 
-        DataSeriesItem item10 = null; int count10 = 0;
-        DataSeriesItem item20 = null; int count20 = 0;
-        DataSeriesItem item30 = null; int count30 = 0;
-        DataSeriesItem item40 = null; int count40 = 0;
+        DataSeriesItem item;
+        int newValue = 0, lastValue = 0, lastAge = 0;
         
-        for(RegisteredPatients p : patientDataManager.getPatientList()){
-            if(p.getAge()< 10){
-                if(item10 == null){
-                    count10++;
-                    item10 = new DataSeriesItem("0 - 10", count10);                    
-                }else{
-                    count10++;
-                }
-            }        
+        for(RegisteredPatients p : patientWithTemperatureAlert){
+            newValue = p.getTemperatureAlertFrequency().size();            
+            // calculates average
+            if(p.getAge().equals(lastAge)){
+                newValue = (p.getTemperatureAlertFrequency().size() + lastValue)/2;
+            }
+            item = new DataSeriesItem(p.getAge().toString(), newValue);
+            series.addItemWithDrilldown(item);
+            
+            lastValue = newValue;
+            lastAge = p.getAge();
         }
         
-        item10.setY(count10);
-        series.addItemWithDrilldown(item10);
-        
-        ageConfig.addSeries(series);
-       
-
+        averageTemperature.addSeries(series);
         return chart;
     }
     
+    
+    /*
+    *  Chart to show average temperature alert distribution by age
     */
+    public Component getAveragePressureAlertChart() {        
+        
+        Chart chart = new Chart(ChartType.COLUMN);
+        chart.setHeight("300px");
+        chart.setWidth("500px");
+
+        Configuration averagePressureConfig = chart.getConfiguration();
+        averagePressureConfig.setTitle("Average Age-Pressure Alert");
+        averagePressureConfig.getLegend().setEnabled(false);
+
+        XAxis x = new XAxis();
+        x.setType(AxisType.CATEGORY);
+        averagePressureConfig.addxAxis(x);
+
+        YAxis y = new YAxis();
+        y.setTitle("Number of alerts");
+        averagePressureConfig.addyAxis(y);
+
+        PlotOptionsColumn column = new PlotOptionsColumn();
+        column.setCursor(Cursor.POINTER);
+        column.setDataLabels(new DataLabels(true));
+
+        averagePressureConfig.setPlotOptions(column);
+        averagePressureConfig.getTooltip().setFormatter(
+                        "'<b>'+ this.point.name +' years old: </b><br/>\'+ this.y +' alerts'");
+
+        DataSeries series = new DataSeries();
+        PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
+        plotOptionsColumn.setColorByPoint(true);
+        series.setPlotOptions(plotOptionsColumn);
+
+        DataSeriesItem item;
+        int newValue = 0, lastValue = 0, lastAge = 0;
+        
+        for(RegisteredPatients p : patientWithPressureAlert){
+            newValue = p.getPressureAlertFrequency().size();            
+            // calculates average
+            if(p.getAge().equals(lastAge)){
+                newValue = (p.getPressureAlertFrequency().size() + lastValue)/2;
+            }
+            item = new DataSeriesItem(p.getAge().toString(), newValue);
+            series.addItemWithDrilldown(item);
+            
+            lastValue = newValue;
+            lastAge = p.getAge();
+        }
+        
+        averagePressureConfig.addSeries(series);
+        return chart;
+    }
     
-    // alertas de glicose por idade
+    /*
+    *  Chart to show average glucose alert distribution by age
+    */
+    public Component getAverageGlucoseAlertChart() {        
+        
+        Chart chart = new Chart(ChartType.COLUMN);
+        chart.setHeight("300px");
+        chart.setWidth("500px");
+
+        Configuration averageGlucoseConfig = chart.getConfiguration();
+        averageGlucoseConfig.setTitle("Average Age-Glucose Alert");
+        averageGlucoseConfig.getLegend().setEnabled(false);
+
+        XAxis x = new XAxis();
+        x.setType(AxisType.CATEGORY);
+        averageGlucoseConfig.addxAxis(x);
+
+        YAxis y = new YAxis();
+        y.setTitle("Number of alerts");
+        averageGlucoseConfig.addyAxis(y);
+
+        PlotOptionsColumn column = new PlotOptionsColumn();
+        column.setCursor(Cursor.POINTER);
+        column.setDataLabels(new DataLabels(true));
+
+        averageGlucoseConfig.setPlotOptions(column);
+        averageGlucoseConfig.getTooltip().setFormatter(
+                        "'<b>'+ this.point.name +' years old: </b><br/>\'+ this.y +' alerts'");
+
+        DataSeries series = new DataSeries();
+        PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
+        plotOptionsColumn.setColorByPoint(true);
+        series.setPlotOptions(plotOptionsColumn);
+
+        DataSeriesItem item;
+        int newValue = 0, lastValue = 0, lastAge = 0;
+        
+        for(RegisteredPatients p : patientWithGlucoseAlert){
+            newValue = p.getGlucoseAlertFrequency().size();            
+            // calculates average
+            if(p.getAge().equals(lastAge)){
+                newValue = (p.getGlucoseAlertFrequency().size() + lastValue)/2;
+            }
+            item = new DataSeriesItem(p.getAge().toString(), newValue);
+            series.addItemWithDrilldown(item);
+            
+            lastValue = newValue;
+            lastAge = p.getAge();
+        }
+        
+        averageGlucoseConfig.addSeries(series);
+        return chart;
+    }
     
-    
-    // historico de alertas e tipos do current patient -> talvez no dashboard
+    /*
+    *  Chart to show average glucose alert distribution by age
+    */
+    public Component getAverageSpo2AlertChart() {        
+        
+        Chart chart = new Chart(ChartType.COLUMN);
+        chart.setHeight("300px");
+        chart.setWidth("500px");
+
+        Configuration averageSpo2Config = chart.getConfiguration();
+        averageSpo2Config.setTitle("Average Age-SpO2 Alert");
+        averageSpo2Config.getLegend().setEnabled(false);
+
+        XAxis x = new XAxis();
+        x.setType(AxisType.CATEGORY);
+        averageSpo2Config.addxAxis(x);
+
+        YAxis y = new YAxis();
+        y.setTitle("Number of alerts");
+        averageSpo2Config.addyAxis(y);
+
+        PlotOptionsColumn column = new PlotOptionsColumn();
+        column.setCursor(Cursor.POINTER);
+        column.setDataLabels(new DataLabels(true));
+
+        averageSpo2Config.setPlotOptions(column);
+        averageSpo2Config.getTooltip().setFormatter(
+                        "'<b>'+ this.point.name +' years old: </b><br/>\'+ this.y +' alerts'");
+
+        DataSeries series = new DataSeries();
+        PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
+        plotOptionsColumn.setColorByPoint(true);
+        series.setPlotOptions(plotOptionsColumn);
+
+        DataSeriesItem item;
+        int newValue = 0, lastValue = 0, lastAge = 0;
+        
+        for(RegisteredPatients p : patientWithSpo2Alert){
+            newValue = p.getSpo2AlertFrequency().size();            
+            // calculates average
+            if(p.getAge().equals(lastAge)){
+                newValue = (p.getSpo2AlertFrequency().size() + lastValue)/2;
+            }
+            item = new DataSeriesItem(p.getAge().toString(), newValue);
+            series.addItemWithDrilldown(item);
+            
+            lastValue = newValue;
+            lastAge = p.getAge();
+        }
+        
+        averageSpo2Config.addSeries(series);
+        return chart;
+    }
 
 }

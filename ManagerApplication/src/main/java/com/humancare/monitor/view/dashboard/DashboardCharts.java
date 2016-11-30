@@ -116,11 +116,9 @@ public class DashboardCharts {
                 manager.configManager(patientSelect.getValue().getIp());
                 patientDataManager.setCurrentPatient(patientSelect.getValue());
                 filterDataByDate();
-                refreshAllGraphs();
-                               
+                refreshAllGraphs();                               
             }
-        });
-               
+        });               
         CssLayout group = new CssLayout(patientSelect, ok);
         group.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         toolbar.addComponent(group);
