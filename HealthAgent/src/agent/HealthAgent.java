@@ -29,6 +29,7 @@ import org.snmp4j.agent.mo.snmp.SnmpTargetMIB;
 import org.snmp4j.agent.mo.snmp.StorageType;
 import org.snmp4j.agent.mo.snmp.VacmMIB;
 import org.snmp4j.agent.security.MutableVACM;
+import org.snmp4j.agent.test.TestAgent;
 import org.snmp4j.mp.MPv3;
 import org.snmp4j.security.SecurityLevel;
 import org.snmp4j.security.SecurityModel;
@@ -43,7 +44,7 @@ import org.snmp4j.transport.TransportMappings;
 import utils.Constants;
 import utils.Utils;
 
-public class HealthAgent extends BaseAgent {
+public class HealthAgent extends TestAgent {
 
     private final String address;
     private static final String CONF_FILE = "conf.agent";
@@ -60,8 +61,7 @@ public class HealthAgent extends BaseAgent {
      * @throws IOException
      */
     public HealthAgent(String address) throws IOException {
-        super(new File(CONF_FILE), new File(BOOT_COUNTER_FILE),
-            new CommandProcessor(new OctetString(MPv3.createLocalEngineID())));
+        super(new File(CONF_FILE), new File(BOOT_COUNTER_FILE));
         this.address = address;
         this.mib = new MibContainer(MIB_FILE);
     }
@@ -131,6 +131,10 @@ public class HealthAgent extends BaseAgent {
         vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3"),
             new OctetString(), VacmMIB.vacmViewIncluded,
             StorageType.nonVolatile);
+        
+        vacm.addViewTreeFamily(new OctetString("fullWriteView"), new OID("1.3"),
+            new OctetString(), VacmMIB.vacmViewIncluded,
+            StorageType.nonVolatile);
 
     }
 
@@ -160,6 +164,7 @@ public class HealthAgent extends BaseAgent {
         try {
             server.register(mo, null);
         } catch (DuplicateRegistrationException ex) {
+            System.out.println(mo.toString());
             throw new RuntimeException(ex);
         }
     }
@@ -188,7 +193,6 @@ public class HealthAgent extends BaseAgent {
         getServer().addContext(new OctetString("public"));
         finishInit();
         this.unregisterManagedObject(this.getSnmpv2MIB());
-        this.setUp();
         run();
         sendColdStartNotification();
 
@@ -208,7 +212,8 @@ public class HealthAgent extends BaseAgent {
      * This method initializes the in-memory MIB at the agent
      *
      */
-    private void setUp() {
+    @Override
+    protected void registerSnmpMIBs() {
         HashMap mibMappings = mib.getMibMappings();
         SortedSet<String> mibOids = mib.getOids();
 

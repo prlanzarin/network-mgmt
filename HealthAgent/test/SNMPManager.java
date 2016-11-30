@@ -19,8 +19,8 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 public class SNMPManager {
 
-    private static TransportMapping transport;
-    private static Snmp snmp;
+    private static final TransportMapping transport;
+    private static final Snmp snmp;
 
     static {
         try {
@@ -31,6 +31,7 @@ public class SNMPManager {
             throw new RuntimeException("Could not initialize SNMP transport mapping!");
         }
     }
+    
     String address = null;
     private int reqNumber = 1;
 
