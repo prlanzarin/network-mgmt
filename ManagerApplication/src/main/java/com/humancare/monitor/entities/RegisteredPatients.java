@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author amanda
  */
-public class RegisteredPatients {
+public class RegisteredPatients implements Comparable{
     
     private String name;
     private String ip;   
@@ -35,6 +35,13 @@ public class RegisteredPatients {
         this.age = age;
         this.gender = gender;
     }
+    
+    @Override
+    public int compareTo(Object patient) {
+        int compareAge=((RegisteredPatients)patient).getAge();        
+        return this.age-compareAge;
+    }
+    
     
     public String getName() {
         return name;

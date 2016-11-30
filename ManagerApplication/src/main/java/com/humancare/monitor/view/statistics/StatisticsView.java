@@ -13,6 +13,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -20,20 +21,24 @@ import com.vaadin.ui.themes.ValoTheme;
  *
  * @author amanda
  */
-public class StatisticsView extends VerticalLayout implements View {
+public class StatisticsView extends Panel implements View {
     StatisticsChart charts = new StatisticsChart();
     PatientDataManager patientDataManager = PatientDataManager.getInstance();
     
     public StatisticsView() {
-        
         patientDataManager.calcGenderStatistic();
+        
+        VerticalLayout layout = new VerticalLayout();      
         setSizeFull();
-        setMargin(true);     
+        setContent(layout);
+        layout.setMargin(true);     
+        layout.addStyleName("dashboard-view");        
+        Responsive.makeResponsive(layout);
 
-        addComponent(buildHeader());
+        layout.addComponent(buildHeader());
         Component content = buildContent();
-        addComponent(content);
-        setExpandRatio(content, 1);
+        layout.addComponent(content);
+        layout.setExpandRatio(content, 1);
     }
     
     private Component buildHeader(){
@@ -58,12 +63,23 @@ public class StatisticsView extends VerticalLayout implements View {
         statisticsPanels.addStyleName("dashboard-panels");
         Responsive.makeResponsive(statisticsPanels);
         
-        HorizontalLayout h = new HorizontalLayout();    
+        HorizontalLayout h1 = new HorizontalLayout();    
 
-        h.addComponent(charts.genderChart());
-       // h.addComponent(charts.getAgeDistChart());
+        h1.addComponent(charts.genderChart());
+        h1.addComponent(charts.getAverageHeartRateAlertChart());
         
-        statisticsPanels.addComponent(h);
+        HorizontalLayout h2 = new HorizontalLayout();    
+        h2.addComponent(charts.getAverageTemperatureAlertChart());
+        h2.addComponent(charts.getAveragePressureAlertChart());
+        
+        HorizontalLayout h3 = new HorizontalLayout();    
+        h3.addComponent(charts.getAverageGlucoseAlertChart());
+        h3.addComponent(charts.getAverageSpo2AlertChart());
+        
+        statisticsPanels.addComponent(h1);
+        statisticsPanels.addComponent(h2);
+        statisticsPanels.addComponent(h3);
+        statisticsPanels.addComponent(charts.buildTable());
         return statisticsPanels;
     }
     
