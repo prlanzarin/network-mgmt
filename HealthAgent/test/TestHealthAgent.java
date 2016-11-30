@@ -52,12 +52,13 @@ public class TestHealthAgent {
         agent = new HealthAgent("udp:0.0.0.0/2001");
         agent.start();
         
+        System.out.println("This agent is surely running, boyo!");
         // Setup the client to use our newly started agent
-        client = new SNMPManager("udp:127.0.0.1/2001");
+        //client = new SNMPManager("udp:127.0.0.1/2001");
         // Set value
-        System.out.println(client.set(Constants.usrName, new OctetString("Michel Temer")).getResponse());
+        //System.out.println(client.set(Constants.usrName, new OctetString("Michel Temer")).getResponse());
         // Get back Value which is set
-        System.out.println("GET: " + client.getAsString(Constants.usrName));
+        //System.out.println("GET: " + client.getAsString(Constants.usrName));
     }
 
 }

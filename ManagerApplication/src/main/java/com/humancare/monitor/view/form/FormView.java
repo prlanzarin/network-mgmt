@@ -100,18 +100,14 @@ public class FormView extends VerticalLayout implements View {
     /*    TextField netTypeField = new TextField("Network Type");
         netTypeField.setRequired(true);
         form.addComponent(netTypeField);
-    */    
-        TextField netSpeedField = new TextField("Network Speed");
-        netSpeedField.setId("netSPeed");
-        netSpeedField.setRequired(true);
-        form.addComponent(netSpeedField);
+    */
         
         //TODO: ver sobre a inserção de sensores
         
 
         form.addComponent(new Button("Send", new ClickListener() {
             @Override
-            public void buttonClick(ClickEvent event) {                
+            public void buttonClick(ClickEvent event) {
                 patientDataManager.addPatientToMib(form);
                 Notification.show("Patient registered succesfully");             
 

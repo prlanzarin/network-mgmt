@@ -1,5 +1,6 @@
 
 import java.io.IOException;
+import java.util.Vector;
 
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
@@ -31,7 +32,7 @@ public class SNMPManager {
             throw new RuntimeException("Could not initialize SNMP transport mapping!");
         }
     }
-    
+
     String address = null;
     private int reqNumber = 1;
 
@@ -99,6 +100,30 @@ public class SNMPManager {
             return event;
         }
         throw new RuntimeException("SET_TIMEOUT");
+    }
+
+    public ResponseEvent getBulk(OID oid, int maxRep) throws IOException {
+        PDU pdu = new PDU();
+        pdu.setType(PDU.GETBULK);
+
+        pdu.add(new VariableBinding(new OID(oid)));
+        pdu.setMaxRepetitions(maxRep);
+        ResponseEvent response = snmp.getBulk(pdu, getTarget("public"));
+        if (response != null) {
+            if (response.getResponse().getErrorStatusText().equalsIgnoreCase("Success")) {
+                PDU pduresponse = response.getResponse();
+                Vector vec = pduresponse.getVariableBindings();
+                System.out.println("snmpwalk2>> size>>" + vec.size());
+                for (int i = 0; i < vec.size(); i++) {
+                    VariableBinding vb = null;
+                    vb = (VariableBinding) vec.elementAt(i);
+                    //System.out.println(i+ " ---- "+vb.toString()); 
+                }
+            }
+            return response;
+        }
+        else
+            throw new RuntimeException("GETBULK timed out");
     }
 
     /**

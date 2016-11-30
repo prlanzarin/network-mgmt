@@ -51,7 +51,7 @@ public final class DashboardView extends Panel implements View,
     private Window notificationsWindow;
     
     private PatientDataManager patientDataManager = PatientDataManager.getInstance();
-    private Manager manager = Manager.getInsance();
+    private Manager manager = Manager.getInstance();
     private PatientData patientData;
    
     private ComboBox<Integer> daysSelect;

@@ -8,7 +8,7 @@ package com.humancare.monitor.snmp;
 import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.entities.Sensor;
-import static com.humancare.monitor.snmp.Manager.OID_S;
+import static com.humancare.monitor.snmp.Constants.OID_S;
 import com.humancare.monitor.view.dashboard.DashboardCharts;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
@@ -51,7 +51,7 @@ public class PatientDataManager {
     private int femPatientsNumber;
     private int malePatientsNumber;
     
-    private Manager MANAGER = Manager.getInsance();   
+    private Manager MANAGER = Manager.getInstance();   
     
     
     protected PatientDataManager(){}
@@ -139,31 +139,34 @@ public class PatientDataManager {
     // TODO: improve call
     public void addPatientToMib(FormLayout form){
         String name = null, ip = null, gender = null;
-        Integer age = null;
+        Integer age = null, nwSpeed = null;
         for(Component c : form) {
             if(c instanceof TextField) {
                 TextField f = (TextField) c;               
-                if(!f.getId().equals("ip")){
-                    System.out.println(f.getId() +" - "+ f.getValue());
-                    try {
-                        MANAGER.set(OID_S.get(f.getId()), f.getValue());
-                    } catch (IOException ex) {
-                        Notification.show("Error saving "+f.getId() +" - "+ f.getValue()+ " information");
-                    }
-                }else{
+                if(f.getId().equals("ip")) {
                     ip = f.getValue();
-                }
-                
+                } else
                 if(f.getId().equals("usrName")){
                     name = f.getValue();
-                }else                
+                } else                
                 if(f.getId().equals("usrAge")){
                     age = Integer.parseInt(f.getValue());
-                }else                
+                } else                
                 if(f.getId().equals("usrGender")){
                     gender = f.getValue();
                 } 
             }
+        }
+        
+        // Register new client info at agent
+        MANAGER.configManager("udp:" + ip + "/2001");
+        try {
+                MANAGER.set(OID_S.get("usrName"), name);
+                MANAGER.set(OID_S.get("usrAge"), age);
+                MANAGER.set(OID_S.get("usrGender"), gender);
+        } 
+        catch (IOException ex) {
+            Notification.show("Error saving patient information in agent");
         }
         
         // add patient to application memory with its ip

@@ -81,7 +81,7 @@ public class DashboardCharts {
     private int numberOfDays;
     private List<PatientData> filteredData;
     private ComboBox<RegisteredPatients> patientSelect; 
-    private Manager manager = Manager.getInsance();
+    private Manager manager = Manager.getInstance();
     
     private static DashboardCharts instance = null;
     
