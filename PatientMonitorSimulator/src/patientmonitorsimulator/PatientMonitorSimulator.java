@@ -5,6 +5,7 @@
  */
 package patientmonitorsimulator;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,11 +16,14 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
@@ -62,8 +66,6 @@ public class PatientMonitorSimulator extends JFrame{
     
     JTextField name = new JTextField(10);        
     JTextField age = new JTextField(10);
-    // mudar para radioButton F ou M
-    JTextField gender = new JTextField(10);
     JTextField latitude = new JTextField(10);
     JTextField longitude = new JTextField(10);
     JTextField x = new JTextField(10);
@@ -79,10 +81,16 @@ public class PatientMonitorSimulator extends JFrame{
     JTextField envHumidity = new JTextField(10);
     JTextField envLuminosity = new JTextField(10);
     
+    JRadioButton optionF = new JRadioButton("Female");
+    JRadioButton optionM = new JRadioButton("Male");
+    ButtonGroup group = new ButtonGroup();
+    
     JButton exportBt = new JButton("Export data");
     
     JPanel patPanel;
     JPanel bigpanel;
+    JPanel measurPanel;
+    JPanel envPanel;
     /*
     * TODO: SENSORES e alarme env
     */
@@ -109,9 +117,13 @@ public class PatientMonitorSimulator extends JFrame{
         temperature.setToolTipText("ºC (ex: 36,8  format: 368)");
         envTemperature.setToolTipText("ºC (ex: 36,8  format: 368)");
         
+        optionF.setText("F");
+        optionM.setText("M");
+        group.add(optionF); 
+        group.add(optionM);
+        
         exportBt.addActionListener(new ActionListener(){
           public void actionPerformed(ActionEvent e){
-            System.out.println("print");
             populateHashTable();
             exportFile();
           }
@@ -122,6 +134,7 @@ public class PatientMonitorSimulator extends JFrame{
         JPanel envPanel = new JPanel(new MigLayout());
         patPanel = new JPanel(new MigLayout());
         
+        //Patient panel
         TitledBorder borderPatient = new TitledBorder("Patient Data");
         borderPatient.setTitleJustification(TitledBorder.CENTER);
         borderPatient.setTitlePosition(TitledBorder.TOP);
@@ -132,7 +145,8 @@ public class PatientMonitorSimulator extends JFrame{
         patPanel.add(agelb);
         patPanel.add(age);
         patPanel.add(genderlb);
-        patPanel.add(gender ,"wrap");
+        patPanel.add(optionF);
+        patPanel.add(optionM, "wrap");
         patPanel.add(latitudelb);
         patPanel.add(latitude);
         patPanel.add(longitudelb);
@@ -145,9 +159,11 @@ public class PatientMonitorSimulator extends JFrame{
         patPanel.add(zlb);
         patPanel.add(z, "wrap");
         
+        // Measure Panel
         TitledBorder borderMeasur = new TitledBorder("Monitoring Data");
         borderMeasur.setTitleJustification(TitledBorder.CENTER);
         borderMeasur.setTitlePosition(TitledBorder.TOP);
+        measurPanel.setPreferredSize(new Dimension(580, 100));
         
         measurPanel.setBorder(borderMeasur);
         measurPanel.add(bloodPressurelb);
@@ -161,9 +177,12 @@ public class PatientMonitorSimulator extends JFrame{
         measurPanel.add(spo2lb);
         measurPanel.add(oxygen, "wrap");
         
+        
+        // Enviroment panel
         TitledBorder borderEnv = new TitledBorder("Enviroment Monitoring Data");
-        borderMeasur.setTitleJustification(TitledBorder.CENTER);
-        borderMeasur.setTitlePosition(TitledBorder.TOP);
+        borderEnv.setTitleJustification(TitledBorder.CENTER);
+        borderEnv.setTitlePosition(TitledBorder.TOP);
+        envPanel.setPreferredSize(new Dimension(580, 100));
         
         envPanel.setBorder(borderEnv);
         envPanel.add(envHumiditylb);
@@ -189,9 +208,10 @@ public class PatientMonitorSimulator extends JFrame{
     
     
     public void populateHashTable(){
+        oidValues.clear();
         oidValues.put(Constants.usrName, name.getText());
         oidValues.put(Constants.usrAge, age.getText());
-        oidValues.put(Constants.usrGender, gender.getText());
+        oidValues.put(Constants.usrGender, optionF.isSelected() ? "F": "M");
         oidValues.put(Constants.usrLatitude, latitude.getText());
         oidValues.put(Constants.usrLongitude, longitude.getText());
         oidValues.put(Constants.usrOrientationX, x.getText());
@@ -208,8 +228,6 @@ public class PatientMonitorSimulator extends JFrame{
         oidValues.put(Constants.envOxygen, envOxygen.getText());
         oidValues.put(Constants.envTemperature, envTemperature.getText());
         oidValues.put(Constants.envLuminosity, envLuminosity.getText());
-    
-    
     
     }
     
