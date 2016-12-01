@@ -185,7 +185,7 @@ public class MibContainer {
     }
 
     public void addSensorTable(HealthAgent agent) {
-        TableMOCreator sensorTableFactory = new TableMOCreator(Constants.hcSensorTable)
+        TableMOCreator sensorTableFactory = new TableMOCreator(Constants.hcSensorEntry)
             .addColumnType(SMIConstants.SYNTAX_INTEGER, MOAccessImpl.ACCESS_READ_ONLY)
             .addColumnType(SMIConstants.SYNTAX_INTEGER, MOAccessImpl.ACCESS_READ_ONLY)
             .addColumnType(SMIConstants.SYNTAX_OCTET_STRING, MOAccessImpl.ACCESS_READ_ONLY)
