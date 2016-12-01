@@ -159,7 +159,7 @@ public class PatientDataManager {
         }
         
         // Register new client info at agent
-        MANAGER.configManager("udp:" + ip + "/2001");
+        MANAGER.configManager(ip);
         try {
                 MANAGER.set(OID_S.get("usrName"), name);
                 MANAGER.set(OID_S.get("usrAge"), age);
@@ -172,6 +172,8 @@ public class PatientDataManager {
         // add patient to application memory with its ip
         RegisteredPatients regPatient = new RegisteredPatients(name, ip, age, gender);
         addPatientToMemory(regPatient);
+        if(currentPatient != null)
+            MANAGER.configManager(currentPatient.getIp());
     }
 
     public void calcGenderStatistic(){
@@ -195,6 +197,7 @@ public class PatientDataManager {
     }
 
     public void setCurrentPatient(RegisteredPatients currentPatient) {
+        System.out.println("Setting current patient to " + currentPatient.toString());
         this.currentPatient = currentPatient;
     }  
     

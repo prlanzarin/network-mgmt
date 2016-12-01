@@ -50,10 +50,6 @@ public final class DashboardView extends Panel implements View,
     private final VerticalLayout root;
     private Window notificationsWindow;
     
-    private PatientDataManager patientDataManager = PatientDataManager.getInstance();
-    private Manager manager = Manager.getInstance();
-    private PatientData patientData;
-   
     private ComboBox<Integer> daysSelect;
     
     private int numberOfDays = 7;
@@ -68,9 +64,7 @@ public final class DashboardView extends Panel implements View,
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
         DashboardEventBus.register(this);
-        
-        manager.configManager("127.0.0.1");
-        
+                
         dashboardCharts.setNumberOfDays(numberOfDays);
         dashboardCharts.filterDataByDate();
         

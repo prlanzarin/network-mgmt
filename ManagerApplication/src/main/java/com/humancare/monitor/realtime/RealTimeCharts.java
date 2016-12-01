@@ -5,6 +5,7 @@
  */
 package com.humancare.monitor.realtime;
 
+import static com.humancare.monitor.snmp.Constants.OID_S;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.humancare.monitor.snmp.PatientDataValidator;
 import com.vaadin.addon.charts.Chart;
@@ -75,8 +76,8 @@ public class RealTimeCharts {
                     while(true){                    
                     Thread.sleep(1000);   
                     Date resultdate = new Date(System.currentTimeMillis());
-                    // Double temperature = Integer.parseInt(patientDataManager.getByOID(OID_S.get("temperature"))) / 10.0;
-                    Double temperature = 370/10.0;
+                    Double temperature = Integer.parseInt(patientDataManager.getByOID(OID_S.get("temperature"))) / 10.0;
+                    //Double temperature = 370/10.0;
                     
                     if(validate.tempAlert(temperature)){
                         if(patientDataManager.getCurrentPatient() != null){
@@ -135,8 +136,8 @@ public class RealTimeCharts {
                     while(true){                    
                     Thread.sleep(1000);   
                     Date resultdate = new Date(System.currentTimeMillis());
-                    //Integer spo2 = Integer.parseInt(patientDataManager.getByOID(OID_S.get("spo2")));
-                    Integer spo2 = 98;
+                    Integer spo2 = Integer.parseInt(patientDataManager.getByOID(OID_S.get("spo2")));
+                    //Integer spo2 = 98;
                     
                     if(validate.spo2Alert(spo2)){
                         if(patientDataManager.getCurrentPatient() != null){
@@ -194,8 +195,8 @@ public class RealTimeCharts {
                     while(true){                    
                     Thread.sleep(1000);   
                     Date resultdate = new Date(System.currentTimeMillis());
-                    //String pressure = patientDataManager.getByOID(OID_S.get("bloodPressure"));
-                    String pressure = "12080";
+                    String pressure = patientDataManager.getByOID(OID_S.get("bloodPressure"));
+                    //String pressure = "12080";
                     int sistolic = Integer.parseInt(pressure.substring(0, 3));
                     int diastolic = Integer.parseInt(pressure.substring(3, 5));
                     
@@ -257,8 +258,8 @@ public class RealTimeCharts {
                     while(true){                    
                     Thread.sleep(1000);   
                     Date resultdate = new Date(System.currentTimeMillis());
-                    //Integer glucose = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodGlucose")));
-                    Integer glucose = 250;
+                    Integer glucose = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodGlucose")));
+                    //Integer glucose = 250;
                     
                     if(validate.glucoseAlert(glucose)){
                         if(patientDataManager.getCurrentPatient() != null){
@@ -322,8 +323,8 @@ public class RealTimeCharts {
         runWhileAttached(heartRatechart, new Runnable() {
             @Override
             public void run() {
-                //int heartValue = Integer.parseInt(patientDataManager.getByOID(OID_S.get("heartRate")));
-                int heartValue = 80;
+                int heartValue = Integer.parseInt(patientDataManager.getByOID(OID_S.get("heartRate")));
+                //int heartValue = 80;
                 Long time = System.currentTimeMillis();
                 hrData.add(new DataSeriesItem(time, heartValue), true, true);
                 

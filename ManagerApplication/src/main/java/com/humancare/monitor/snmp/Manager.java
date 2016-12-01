@@ -59,13 +59,14 @@ public class Manager {
 
     public static Manager getInstance() {
         if (instance == null) {
+            System.out.println("Getting new instance");
             instance = new Manager();
         }
         return instance;
     }
 
     public void configManager(String add) {
-        address = add;
+        address = "udp:" + add + "/2001";
         //Manager client = new Manager("udp:127.0.0.1/161");
     }
 
@@ -99,7 +100,8 @@ public class Manager {
             pdu.add(new VariableBinding(oid));
         }
         pdu.setType(PDU.GET);
-        ResponseEvent event = snmp.send(pdu, getTarget(PUBLIC_COMMUNITY), null);
+         pdu.setRequestID(new Integer32(requestID++));
+        ResponseEvent event = snmp.get(pdu, getTarget(PUBLIC_COMMUNITY));
         if (event != null) {
             return event;
         }
@@ -124,12 +126,12 @@ public class Manager {
         pdu.setMaxRepetitions(maxRepetitions);
         pdu.setNonRepeaters(0);
 
-        ResponseEvent event = snmp.send(pdu, getTarget(PUBLIC_COMMUNITY), null);
+        ResponseEvent event = snmp.getBulk(pdu, getTarget(PUBLIC_COMMUNITY));
         if (event != null) {
             return event;
         }
 
-        throw new RuntimeException("GET timed out");
+        throw new RuntimeException("GETBULK timed out");
     }
 
     /**
