@@ -8,10 +8,6 @@ import com.humancare.monitor.domain.DashboardNotification;
 import com.humancare.monitor.event.DashboardEvent.CloseOpenWindowsEvent;
 import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import com.humancare.monitor.event.DashboardEventBus;
-import com.humancare.monitor.entities.PatientData;
-import com.humancare.monitor.snmp.Manager;
-import com.humancare.monitor.snmp.PatientDataManager;
-import com.humancare.monitor.view.dashboard.DashboardEdit.DashboardEditListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -38,8 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public final class DashboardView extends Panel implements View,
-        DashboardEditListener {
+public final class DashboardView extends Panel implements View {
 
     public static final String EDIT_ID = "dashboard-edit";
     public static final String TITLE_ID = "dashboard-title";
@@ -259,11 +254,6 @@ public final class DashboardView extends Panel implements View,
     @Override
     public void enter(final ViewChangeEvent event) {
         notificationsButton.updateNotificationsCount(null);
-    }
-
-    @Override
-    public void dashboardNameEdited(final String name) {
-        titleLabel.setValue(name);
     }
 
     public static final class NotificationsButton extends Button {
