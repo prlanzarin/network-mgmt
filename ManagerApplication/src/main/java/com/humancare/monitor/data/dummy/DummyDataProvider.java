@@ -42,28 +42,6 @@ public class DummyDataProvider implements DataProvider {
         user.setBio("Quis aute iure reprehenderit in voluptate velit esse."
                 + "Cras mattis iudicium purus sit amet fermentum.");
         return user;
-    }
-   
-
-    @Override
-    public int getUnreadNotificationsCount() {
-    /*    Predicate<DashboardNotification> unreadPredicate = new Predicate<DashboardNotification>() {
-            @Override
-            public boolean apply(DashboardNotification input) {
-                return !input.isRead();
-            }
-        };
-        return Collections2.filter(notifications, unreadPredicate).size();
-*/ return 0;
-    }
-
-    @Override
-    public Collection<DashboardNotification> getNotifications() {
-    /*    for (DashboardNotification notification : notifications) {
-            notification.setRead(true);
-        }
-        return Collections.unmodifiableCollection(notifications);
-*/ return null;
-    }
+    }   
 
 }

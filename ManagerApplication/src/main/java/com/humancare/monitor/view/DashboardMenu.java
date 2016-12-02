@@ -14,6 +14,7 @@ import com.humancare.monitor.event.DashboardEvent.ReportsCountUpdatedEvent;
 import com.humancare.monitor.event.DashboardEvent.TransactionReportEvent;
 import com.humancare.monitor.event.DashboardEvent.UserLoggedOutEvent;
 import com.humancare.monitor.event.DashboardEventBus;
+import com.humancare.monitor.snmp.PatientDataManager;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
@@ -227,8 +228,7 @@ public final class DashboardMenu extends CustomComponent {
     @Subscribe
     public void updateNotificationsCount(
             final NotificationsCountUpdatedEvent event) {
-        int unreadNotificationsCount = DashboardUI.getDataProvider()
-                .getUnreadNotificationsCount();
+        int unreadNotificationsCount = PatientDataManager.getCountNotifications();
         notificationsBadge.setValue(String.valueOf(unreadNotificationsCount));
         notificationsBadge.setVisible(unreadNotificationsCount > 0);
     }

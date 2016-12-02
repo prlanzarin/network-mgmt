@@ -6,6 +6,7 @@
 package com.humancare.monitor.realtime;
 
 import static com.humancare.monitor.snmp.Constants.OID_S;
+import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.humancare.monitor.snmp.PatientDataValidator;
 import com.vaadin.addon.charts.Chart;
@@ -41,6 +42,7 @@ public class RealTimeCharts {
     private final int UPDATE_INTERVAL_TIME = 1000;
     PatientDataManager patientDataManager = PatientDataManager.getInstance();
     PatientDataValidator validate = new PatientDataValidator();
+    Manager manager = Manager.getInstance();
     
      // Heart Rate Chart attributes
     private Chart heartRatechart;
@@ -74,23 +76,26 @@ public class RealTimeCharts {
             public void run(){
                 try {
                     while(true){                    
-                    Thread.sleep(1000);   
-                    Date resultdate = new Date(System.currentTimeMillis());
-                    Double temperature = Integer.parseInt(patientDataManager.getByOID(OID_S.get("temperature"))) / 10.0;
-                    //Double temperature = 370/10.0;
-                    
-                    if(validate.tempAlert(temperature)){
-                        if(patientDataManager.getCurrentPatient() != null){
-                            patientDataManager.getCurrentPatient().addTempAlertList(resultdate);
+                    Thread.sleep(1000);  
+                    if(manager.getAddress() != null){
+                        Date resultdate = new Date(System.currentTimeMillis());
+                        Double temperature = Integer.parseInt(patientDataManager.getByOID(OID_S.get("temperature"))) / 10.0;
+                       
+                        if(validate.tempAlert(temperature)){
+                            if(patientDataManager.getCurrentPatient() != null){
+                                patientDataManager.getCurrentPatient().addTempAlertList(resultdate);
+                                /*
+                                * send notification
+                                */                            
+                                PatientDataManager.addNotification(patientDataManager.getCurrentPatient().getName(), 
+                                        "Temperature Alert!", sdf.format(resultdate), "Current temperature indicates health risks");
+                            }
+                        }    
+
+                        valuelb.setValue(temperature.toString());
+                        time.setValue("Last update: " + sdf.format(resultdate));
+                        Thread.sleep(1000); 
                         }
-                        /*
-                        * notification
-                        */
-                    }    
-                    
-                    valuelb.setValue(temperature.toString());
-                    time.setValue("Last update: " + sdf.format(resultdate));
-                    Thread.sleep(1000); 
                     }
                 } catch (InterruptedException ex) {                    
                     System.out.println("Thread stopped");
@@ -135,21 +140,25 @@ public class RealTimeCharts {
                 try {
                     while(true){                    
                     Thread.sleep(1000);   
-                    Date resultdate = new Date(System.currentTimeMillis());
-                    Integer spo2 = Integer.parseInt(patientDataManager.getByOID(OID_S.get("spo2")));
-                    //Integer spo2 = 98;
-                    
-                    if(validate.spo2Alert(spo2)){
-                        if(patientDataManager.getCurrentPatient() != null){
-                            patientDataManager.getCurrentPatient().addSpo2AlertList(resultdate);
+                    if(manager.getAddress() != null){
+                        Date resultdate = new Date(System.currentTimeMillis());
+                        Integer spo2 = Integer.parseInt(patientDataManager.getByOID(OID_S.get("spo2")));
+                        //Integer spo2 = 98;
+
+                        if(validate.spo2Alert(spo2)){
+                            if(patientDataManager.getCurrentPatient() != null){
+                                patientDataManager.getCurrentPatient().addSpo2AlertList(resultdate);
+                            }
+                            /*
+                            * send notification
+                            */                            
+                            PatientDataManager.addNotification(patientDataManager.getCurrentPatient().getName(), 
+                                    "Oxygen Alert!", sdf.format(resultdate), "Oxygen saturation indicates health risks");
                         }
-                        /*
-                        * notification
-                        */
-                    }
-                    valuelb.setValue(spo2.toString());
-                    time.setValue("Last update: " + sdf.format(resultdate));
-                    Thread.sleep(1000); 
+                        valuelb.setValue(spo2.toString());
+                        time.setValue("Last update: " + sdf.format(resultdate));
+                        Thread.sleep(1000); 
+                        }
                     }
                 } catch (InterruptedException ex) {                    
                     System.out.println("Thread stopped");
@@ -194,25 +203,29 @@ public class RealTimeCharts {
                 try {
                     while(true){                    
                     Thread.sleep(1000);   
-                    Date resultdate = new Date(System.currentTimeMillis());
-                    String pressure = patientDataManager.getByOID(OID_S.get("bloodPressure"));
-                    //String pressure = "12080";
-                    int sistolic = Integer.parseInt(pressure.substring(0, 3));
-                    int diastolic = Integer.parseInt(pressure.substring(3, 5));
-                    
-                    if(validate.pressureAlert(sistolic, diastolic)){
-                        if(patientDataManager.getCurrentPatient() != null){
-                            patientDataManager.getCurrentPatient().addPressureAlertList(resultdate);
+                    if(manager.getAddress() != null){
+                        Date resultdate = new Date(System.currentTimeMillis());
+                        String pressure = patientDataManager.getByOID(OID_S.get("bloodPressure"));
+                        //String pressure = "12080";
+                        int sistolic = Integer.parseInt(pressure.substring(0, 3));
+                        int diastolic = Integer.parseInt(pressure.substring(3, 5));
+
+                        if(validate.pressureAlert(sistolic, diastolic)){
+                            if(patientDataManager.getCurrentPatient() != null){
+                                patientDataManager.getCurrentPatient().addPressureAlertList(resultdate);
+                            }
+                            /*
+                            * send notification
+                            */                            
+                            PatientDataManager.addNotification(patientDataManager.getCurrentPatient().getName(), 
+                                    "Pressure Alert!", sdf.format(resultdate), "Current pressure indicates health risks");
+                        }                    
+
+                        String formatPressure = sistolic +"/" + diastolic;
+                        valuelb.setValue(formatPressure);
+                        time.setValue("Last update: " + sdf.format(resultdate));
+                        Thread.sleep(1000); 
                         }
-                        /*
-                        * notification
-                        */
-                    }                    
-                    
-                    String formatPressure = sistolic +"/" + diastolic;
-                    valuelb.setValue(formatPressure);
-                    time.setValue("Last update: " + sdf.format(resultdate));
-                    Thread.sleep(1000); 
                     }
                 } catch (InterruptedException ex) {                    
                     System.out.println("Thread stopped");
@@ -257,21 +270,25 @@ public class RealTimeCharts {
                 try {
                     while(true){                    
                     Thread.sleep(1000);   
-                    Date resultdate = new Date(System.currentTimeMillis());
-                    Integer glucose = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodGlucose")));
-                    //Integer glucose = 250;
-                    
-                    if(validate.glucoseAlert(glucose)){
-                        if(patientDataManager.getCurrentPatient() != null){
-                            patientDataManager.getCurrentPatient().addGlucoseAlertList(resultdate);
+                    if(manager.getAddress() != null){
+                        Date resultdate = new Date(System.currentTimeMillis());
+                        Integer glucose = Integer.parseInt(patientDataManager.getByOID(OID_S.get("bloodGlucose")));
+                        //Integer glucose = 250;
+
+                        if(validate.glucoseAlert(glucose)){
+                            if(patientDataManager.getCurrentPatient() != null){
+                                patientDataManager.getCurrentPatient().addGlucoseAlertList(resultdate);
+                            }
+                           /*
+                            * send notification
+                            */                            
+                            PatientDataManager.addNotification(patientDataManager.getCurrentPatient().getName(), 
+                                    "Blood Glucose Alert!", sdf.format(resultdate), "Blood glucose indicates health risks");
+                        }                   
+                        valuelb.setValue(glucose.toString());
+                        time.setValue("Last update: " + sdf.format(resultdate));
+                        Thread.sleep(1000); 
                         }
-                        /*
-                        * notification
-                        */
-                    }                   
-                    valuelb.setValue(glucose.toString());
-                    time.setValue("Last update: " + sdf.format(resultdate));
-                    Thread.sleep(1000); 
                     }
                 } catch (InterruptedException ex) {                    
                     System.out.println("Thread stopped");
@@ -320,26 +337,31 @@ public class RealTimeCharts {
         for (int i = 0; i <= 10; i++) {
             hrData.add(new DataSeriesItem(System.currentTimeMillis(), 0));
         }
+        
         runWhileAttached(heartRatechart, new Runnable() {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");   
+            
             @Override
             public void run() {
-                int heartValue = Integer.parseInt(patientDataManager.getByOID(OID_S.get("heartRate")));
-                //int heartValue = 80;
-                Long time = System.currentTimeMillis();
-                hrData.add(new DataSeriesItem(time, heartValue), true, true);
-                
-                if(validate.heartRateAlert(heartValue)){
-                    if(patientDataManager.getCurrentPatient() != null){
-                        patientDataManager.getCurrentPatient().addHeartRateAlertList(new Date(time));
-                    }
+                if(manager.getAddress() != null){
+                    int heartValue = Integer.parseInt(patientDataManager.getByOID(OID_S.get("heartRate")));
+                    //int heartValue = 80;
+                    Long time = System.currentTimeMillis();
+                    hrData.add(new DataSeriesItem(time, heartValue), true, true);
 
-                    /*
-                    * notification
-                    */
-                }   
+                    if(validate.heartRateAlert(heartValue)){
+                        if(patientDataManager.getCurrentPatient() != null){
+                            patientDataManager.getCurrentPatient().addHeartRateAlertList(new Date(time));
+                        }
+                        /*
+                        * send notification
+                        */                            
+                        PatientDataManager.addNotification(patientDataManager.getCurrentPatient().getName(), 
+                                "Heart Rate Alert!", sdf.format(time), "Heart Rate indicates health risks");
+                    }   
+                }
             }
         }, 1000, 1000);
-
         configurationHR.setSeries(hrData);
 
         heartRatechart.drawChart(configurationHR);
