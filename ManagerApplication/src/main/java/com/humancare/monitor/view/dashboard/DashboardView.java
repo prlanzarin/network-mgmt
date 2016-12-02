@@ -174,7 +174,7 @@ public final class DashboardView extends Panel implements View {
         dashboardPanels.addComponent(dashboardCharts.getPressureChart());
         dashboardPanels.addComponent(dashboardCharts.getGlucoseChart());
         dashboardPanels.addComponent(dashboardCharts.getEnvTempChart());
-        dashboardPanels.addComponent(dashboardCharts.getEnvTempChart());
+        dashboardPanels.addComponent(dashboardCharts.getEnvHumidityChart());
         dashboardPanels.addComponent(dashboardCharts.getEnvOxyChart());
         
         return dashboardPanels;
