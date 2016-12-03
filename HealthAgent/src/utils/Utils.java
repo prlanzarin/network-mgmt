@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utils;
 
 import net.percederberg.mibble.MibSymbol;
@@ -12,16 +7,13 @@ import net.percederberg.mibble.snmp.SnmpAccess;
 import net.percederberg.mibble.value.ObjectIdentifierValue;
 import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.mo.MOAccessImpl;
-import org.snmp4j.smi.Gauge32;
-import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.Variable;
 
 public final class Utils {
-    
-    
-        /**
-     * Method which takes a MibSymbol and extracts its @OID
+
+    /**
+     * Method which takes a MibSymbol and extracts its OID
      *
      * @param symbol
      * @return ObjectIdentifierValue
@@ -33,15 +25,20 @@ public final class Utils {
         if (symbol instanceof MibValueSymbol) {
             value = ((MibValueSymbol) symbol).getValue();
             if (value instanceof ObjectIdentifierValue) {
-               oidString = ((ObjectIdentifierValue) value).toString();
-               return Constants.MONames.get(oidString);
+                oidString = ((ObjectIdentifierValue) value).toString();
+                return Constants.MONames.get(oidString);
             }
         }
         return null;
     }
-    
+
+    /**
+     * Auxiliary method for converting Mibble access modes to SNMP4J access modes.
+     * @param mode SnmpAccess mibble
+     * @return MOAccess snmp4j
+     */
     public static final MOAccess extractSnmp4jMode(SnmpAccess mode) {
-        switch(mode.toString()) {
+        switch (mode.toString()) {
             case "read-only":
                 return MOAccessImpl.ACCESS_READ_ONLY;
             case "read-write":
@@ -102,5 +99,4 @@ public final class Utils {
     public static Variable genLocationData() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
 }

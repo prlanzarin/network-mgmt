@@ -1,30 +1,9 @@
-
-
-
 import agent.HealthAgent;
-import agent.model.MibContainer;
-import agent.model.ScalarMOCreator;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.SortedSet;
-import net.percederberg.mibble.MibSymbol;
-import net.percederberg.mibble.MibType;
-import net.percederberg.mibble.MibValueSymbol;
-import net.percederberg.mibble.snmp.SnmpAccess;
-import net.percederberg.mibble.snmp.SnmpObjectType;
-import org.snmp4j.PDU;
-import org.snmp4j.agent.BaseAgent;
-import org.snmp4j.agent.mo.MOScalar;
-import org.snmp4j.event.ResponseEvent;
 
-import org.snmp4j.smi.OID;
-import org.snmp4j.smi.OctetString;
 import utils.Constants;
-import utils.Utils;
 
 public class TestHealthAgent {
-
-    private HashMap<String, HealthAgent> agents;
 
     public static void main(String[] args) throws IOException {
         TestHealthAgent client = new TestHealthAgent("udp:127.0.0.1/161");
@@ -51,7 +30,7 @@ public class TestHealthAgent {
     private void init() throws IOException {
         agent = new HealthAgent("udp:0.0.0.0/2001");
         agent.start();
-        
+
         System.out.println("This agent is surely running, boyo!");
         // Setup the client to use our newly started agent
         client = new SNMPManager("udp:127.0.0.1/2001");

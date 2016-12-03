@@ -21,11 +21,9 @@ import net.percederberg.mibble.MibValueSymbol;
 import net.percederberg.mibble.snmp.SnmpAccess;
 import net.percederberg.mibble.snmp.SnmpObjectType;
 import net.percederberg.mibble.value.ObjectIdentifierValue;
-import org.snmp4j.agent.ManagedObject;
 import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.agent.mo.MOTable;
-import org.snmp4j.agent.mo.MOTableRow;
 import org.snmp4j.smi.Gauge32;
 import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
@@ -67,6 +65,16 @@ public class MibContainer {
         System.out.println(oids);
     }
 
+    /**
+     * Does the MIB loading using Mibble; we use this library to automagically
+     * extract/parse OID info so we can load it on a more general way.
+     *
+     * @param file MIB (.mib) file
+     * @return Mib
+     * @throws FileNotFoundException
+     * @throws MibLoaderException
+     * @throws IOException
+     */
     private Mib loadMib(File file)
         throws FileNotFoundException, MibLoaderException, IOException {
 
@@ -140,13 +148,13 @@ public class MibContainer {
         return mibMappings;
     }
 
-     /**
+    /**
      * @return the scalar MOs mappings
      */
     public final HashMap getScalarMappings() {
         return scalarMappings;
     }
-    
+
     /**
      * @return sorted set of OIDs
      */
@@ -161,21 +169,17 @@ public class MibContainer {
         this.mibMappings = mibMappings;
     }
 
-    private void printMibMappings(HashMap mibMappings) {
-        for (Object name : mibMappings.keySet()) {
-            String key = name.toString();
-            String value = mibMappings.get(name).toString();
-            System.out.println(key + " =====> " + value);
-        }
-    }
-
+    /**
+     * Method responsible for adding/loading an scalar managed object to our
+     * loaded Mib; it uses our Scalar MO factory to do so.
+     *
+     * @param symbol MibSymbol
+     * @param type MibType ASN.1 type
+     * @param agent HealthAgent agent
+     */
     public void addScalar(MibSymbol symbol, MibType type, HealthAgent agent) {
         MibType syntax = ((SnmpObjectType) type).getSyntax();
         SnmpAccess mode = ((SnmpObjectType) type).getAccess();
-
-        System.out.println("OBJECT TYPE (SCALAR) => " + syntax.getName() + 
-            " OID => " + Utils.extractSnmp4jOid(symbol) + " MODE => " + 
-            mode.toString() + " NAME > " + ((MibValueSymbol) symbol).getName());
 
         OID mOid = Utils.extractSnmp4jOid(symbol);
         MOScalar smo = ScalarMOCreator.create(mOid,
@@ -184,6 +188,12 @@ public class MibContainer {
         scalarMappings.put(mOid, smo);
     }
 
+    /**
+     * Method responsible for loading and populating our sensor table with
+     * pre-defined information.
+     *
+     * @param agent
+     */
     public void addSensorTable(HealthAgent agent) {
         TableMOCreator sensorTableFactory = new TableMOCreator(Constants.hcSensorEntry)
             .addColumnType(SMIConstants.SYNTAX_INTEGER, MOAccessImpl.ACCESS_READ_ONLY)
@@ -194,7 +204,7 @@ public class MibContainer {
             // sensor x
             .addRowValue(new Integer32(1))
             .addRowValue(new Integer32(5))
-            .addRowValue(new OctetString (""))
+            .addRowValue(new OctetString(""))
             .addRowValue(new Gauge32(10000000))
             .addRowValue(new Integer32(1500))
             // sensor y
@@ -207,12 +217,26 @@ public class MibContainer {
         this.sensorTable = sensorTableFactory.build();
         agent.registerManagedObject(this.sensorTable);
     }
-    
+
+    /**
+     * Method responsible for updating a registered MO instance value.
+     *
+     * @param smo
+     * @param value
+     */
     public void updateScalar(MOScalar smo, Variable value) {
         smo.setValue(value);
     }
-    
+
     public void updateTableValue(OID oid, VariableBinding vb) {
         sensorTable.setValue(vb);
+    }
+
+    private void printMibMappings(HashMap mibMappings) {
+        for (Object name : mibMappings.keySet()) {
+            String key = name.toString();
+            String value = mibMappings.get(name).toString();
+            System.out.println(key + " =====> " + value);
+        }
     }
 }

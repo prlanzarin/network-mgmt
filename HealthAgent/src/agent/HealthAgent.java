@@ -9,14 +9,11 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import net.percederberg.mibble.MibSymbol;
 import net.percederberg.mibble.MibType;
 import net.percederberg.mibble.MibValueSymbol;
 
 import org.snmp4j.TransportMapping;
-import org.snmp4j.agent.BaseAgent;
-import org.snmp4j.agent.CommandProcessor;
 import org.snmp4j.agent.DuplicateRegistrationException;
 import org.snmp4j.agent.MOGroup;
 import org.snmp4j.agent.ManagedObject;
@@ -24,13 +21,10 @@ import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.agent.mo.MOTableRow;
 import org.snmp4j.agent.mo.snmp.RowStatus;
 import org.snmp4j.agent.mo.snmp.SnmpCommunityMIB;
-import org.snmp4j.agent.mo.snmp.SnmpNotificationMIB;
-import org.snmp4j.agent.mo.snmp.SnmpTargetMIB;
 import org.snmp4j.agent.mo.snmp.StorageType;
 import org.snmp4j.agent.mo.snmp.VacmMIB;
 import org.snmp4j.agent.security.MutableVACM;
 import org.snmp4j.agent.test.TestAgent;
-import org.snmp4j.mp.MPv3;
 import org.snmp4j.security.SecurityLevel;
 import org.snmp4j.security.SecurityModel;
 import org.snmp4j.security.USM;
@@ -67,7 +61,7 @@ public class HealthAgent extends TestAgent {
     }
 
     /**
-     * Adds community to security name mappings needed for SNMPv1 and SNMPv2c.
+     * Community mappings for loaded MIB (SNMPv2 based)
      *
      * @param communityMIB
      */
@@ -75,39 +69,15 @@ public class HealthAgent extends TestAgent {
     protected void addCommunities(SnmpCommunityMIB communityMIB) {
         Variable[] com2sec = new Variable[]{new OctetString("public"),
             new OctetString("cpublic"), // security name
-            getAgent().getContextEngineID(), // local engine ID
+            getAgent().getContextEngineID(),
             new OctetString("public"), // default context name
-            new OctetString(), // transport tag
+            new OctetString(),
             new Integer32(StorageType.nonVolatile), // storage type
             new Integer32(RowStatus.active) // row status
     };
         MOTableRow row = communityMIB.getSnmpCommunityEntry().createRow(
             new OctetString("public2public").toSubIndex(true), com2sec);
         communityMIB.getSnmpCommunityEntry().addRow((SnmpCommunityMIB.SnmpCommunityEntryRow) row);
-
-    }
-
-    /**
-     * Adds initial notification targets and filters.
-     *
-     * @param arg0
-     * @param arg1
-     */
-    @Override
-    protected void addNotificationTargets(SnmpTargetMIB arg0,
-        SnmpNotificationMIB arg1) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * Adds all the necessary initial users to the USM.
-     *
-     * @param arg0
-     */
-    @Override
-    protected void addUsmUser(USM arg0) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -131,7 +101,7 @@ public class HealthAgent extends TestAgent {
         vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3"),
             new OctetString(), VacmMIB.vacmViewIncluded,
             StorageType.nonVolatile);
-        
+
         vacm.addViewTreeFamily(new OctetString("fullWriteView"), new OID("1.3"),
             new OctetString(), VacmMIB.vacmViewIncluded,
             StorageType.nonVolatile);
@@ -139,24 +109,8 @@ public class HealthAgent extends TestAgent {
     }
 
     /**
-     * Unregister the basic MIB modules from the agent's MOServer.
-     */
-    @Override
-    protected void unregisterManagedObjects() {
-
-    }
-
-    /**
-     * Register additional managed objects at the agent's server.
-     */
-    @Override
-    protected void registerManagedObjects() {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * Clients can register the MO they need
+     * Method responsible for managed objects registration. Clients can call
+     * this, but we only use it to load our MIB's MOs.
      *
      * @param mo
      */
@@ -164,26 +118,37 @@ public class HealthAgent extends TestAgent {
         try {
             server.register(mo, null);
         } catch (DuplicateRegistrationException ex) {
-            System.out.println(mo.toString());
             throw new RuntimeException(ex);
         }
     }
 
+    /**
+     * Method responsible for unloading/removing an entry to a MO at our MIB.
+     *
+     * @param moGroup
+     */
     public void unregisterManagedObject(MOGroup moGroup) {
         moGroup.unregisterMOs(server, getContext(moGroup));
     }
 
+    /**
+     * Method responsible for initializing the agent's transport mappings (where
+     * the agent should listen to incoming SNMP polls, IP and PORT)
+     *
+     * @throws IOException
+     */
+    @Override
     protected void initTransportMappings() throws IOException {
         transportMappings = new TransportMapping[1];
-        Address addr = GenericAddress.parse(address);
+        Address addr = GenericAddress.parse(this.address);
         TransportMapping tm = TransportMappings.getInstance()
             .createTransportMapping(addr);
         transportMappings[0] = tm;
     }
 
     /**
-     * Start method invokes some initialization methods needed to start the
-     * agent
+     * Main loop responsible for agent's MIB setup and executor that extracts
+     * simulation info from a file.
      *
      * @throws IOException
      */
@@ -192,10 +157,12 @@ public class HealthAgent extends TestAgent {
         addShutdownHook();
         getServer().addContext(new OctetString("public"));
         finishInit();
+        // removing standard MIB that comes with TestAgent
         this.unregisterManagedObject(this.getSnmpv2MIB());
         run();
         sendColdStartNotification();
 
+        // getting info from simulation file
         //this.executorService.scheduleAtFixedRate(new Runnable() {
         //    @Override
         //    public void run() {
@@ -209,7 +176,7 @@ public class HealthAgent extends TestAgent {
     }
 
     /**
-     * This method initializes the in-memory MIB at the agent
+     * This method initializes the in-memory MIB at the agent.
      *
      */
     @Override
@@ -223,13 +190,16 @@ public class HealthAgent extends TestAgent {
 
             if (((MibValueSymbol) symbol).isScalar()) {
                 mib.addScalar(symbol, type, this);
-            } else {
-                System.out.println("OBJECT TYPE => " + ((MibValueSymbol) symbol).getName());
             }
         }
         this.mib.addSensorTable(this);
     }
 
+    /**
+     * Method responsible for getting info from simulation file and updating our
+     * MO's values.
+     *
+     */
     private void generateMibData() {
         HashMap scalarMappings = mib.getScalarMappings();
         SortedSet<String> mibOids = mib.getOids();
@@ -239,7 +209,7 @@ public class HealthAgent extends TestAgent {
             Entry thisEntry = (Entry) entries.next();
             OID oid = (OID) thisEntry.getKey();
             MOScalar smo = (MOScalar) thisEntry.getValue();
-            
+
             if (oid.equals(Constants.bdBloodPressure)) {
                 mib.updateScalar(smo, Utils.genBloodPressureData());
             } else if (oid.equals(Constants.usrLatitude)

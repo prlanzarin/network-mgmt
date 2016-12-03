@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.util.Vector;
 
@@ -18,6 +17,10 @@ import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
+/**
+ * This is a test class in which we developed a simple manager to test our agent.
+ * 
+ */
 public class SNMPManager {
 
     private static final TransportMapping transport;
@@ -113,17 +116,16 @@ public class SNMPManager {
             if (response.getResponse().getErrorStatusText().equalsIgnoreCase("Success")) {
                 PDU pduresponse = response.getResponse();
                 Vector vec = pduresponse.getVariableBindings();
-                System.out.println("snmpwalk2>> size>>" + vec.size());
                 for (int i = 0; i < vec.size(); i++) {
                     VariableBinding vb = null;
                     vb = (VariableBinding) vec.elementAt(i);
-                    System.out.println(i+ " ---- "+vb.toString()); 
+                    System.out.println(i + " ---- " + vb.toString());
                 }
             }
             return response;
-        }
-        else
+        } else {
             throw new RuntimeException("GETBULK timed out");
+        }
     }
 
     /**
