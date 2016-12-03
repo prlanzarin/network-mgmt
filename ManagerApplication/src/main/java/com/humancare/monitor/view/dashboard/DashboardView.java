@@ -8,10 +8,7 @@ import com.humancare.monitor.domain.DashboardNotification;
 import com.humancare.monitor.event.DashboardEvent.CloseOpenWindowsEvent;
 import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import com.humancare.monitor.event.DashboardEventBus;
-import com.humancare.monitor.entities.PatientData;
-import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
-import com.humancare.monitor.view.dashboard.DashboardEdit.DashboardEditListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -38,8 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public final class DashboardView extends Panel implements View,
-        DashboardEditListener {
+public final class DashboardView extends Panel implements View {
 
     public static final String EDIT_ID = "dashboard-edit";
     public static final String TITLE_ID = "dashboard-title";
@@ -54,6 +50,7 @@ public final class DashboardView extends Panel implements View,
     
     private int numberOfDays = 7;
     private DashboardCharts dashboardCharts = DashboardCharts.getInstance();
+    private PatientDataManager patientDataManager = PatientDataManager.getInstance();
     
     
      
@@ -179,7 +176,7 @@ public final class DashboardView extends Panel implements View,
         dashboardPanels.addComponent(dashboardCharts.getPressureChart());
         dashboardPanels.addComponent(dashboardCharts.getGlucoseChart());
         dashboardPanels.addComponent(dashboardCharts.getEnvTempChart());
-        dashboardPanels.addComponent(dashboardCharts.getEnvTempChart());
+        dashboardPanels.addComponent(dashboardCharts.getEnvHumidityChart());
         dashboardPanels.addComponent(dashboardCharts.getEnvOxyChart());
         
         return dashboardPanels;
@@ -195,34 +192,35 @@ public final class DashboardView extends Panel implements View,
         title.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         notificationsLayout.addComponent(title);
 
-        Collection<DashboardNotification> notifications = DashboardUI
-                .getDataProvider().getNotifications();
-        DashboardEventBus.post(new NotificationsCountUpdatedEvent());
+        Collection<DashboardNotification> notifications = patientDataManager.getNotifications();        
 
-        for (DashboardNotification notification : notifications) {
-            VerticalLayout notificationLayout = new VerticalLayout();
-            notificationLayout.addStyleName("notification-item");
+        if(patientDataManager.getNotifications() != null){
+            DashboardEventBus.post(new NotificationsCountUpdatedEvent());
+            for (DashboardNotification notification : notifications) {
+                VerticalLayout notificationLayout = new VerticalLayout();
+                notificationLayout.addStyleName("notification-item");
 
-            Label titleLabel = new Label(notification.getFirstName() + " "
-                    + notification.getLastName() + " "
-                    + notification.getAction());
-            titleLabel.addStyleName("notification-title");
+                Label titleLabel = new Label(notification.getFirstName() + " "
+                        + notification.getLastName() + " "
+                        + notification.getAction());
+                titleLabel.addStyleName("notification-title");
 
-            Label timeLabel = new Label(notification.getPrettyTime());
-            timeLabel.addStyleName("notification-time");
+                Label timeLabel = new Label(notification.getPrettyTime());
+                timeLabel.addStyleName("notification-time");
 
-            Label contentLabel = new Label(notification.getContent());
-            contentLabel.addStyleName("notification-content");
+                Label contentLabel = new Label(notification.getContent());
+                contentLabel.addStyleName("notification-content");
 
-            notificationLayout.addComponents(titleLabel, timeLabel,
-                    contentLabel);
-            notificationsLayout.addComponent(notificationLayout);
+                notificationLayout.addComponents(titleLabel, timeLabel,
+                        contentLabel);
+                notificationsLayout.addComponent(notificationLayout);
+            }
         }
 
         HorizontalLayout footer = new HorizontalLayout();
         footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
         footer.setWidth("100%");
-        Button showAll = new Button("View All Notifications",
+        /*Button showAll = new Button("View All Notifications",
                 new ClickListener() {
                     @Override
                     public void buttonClick(final ClickEvent event) {
@@ -232,7 +230,7 @@ public final class DashboardView extends Panel implements View,
         showAll.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
         showAll.addStyleName(ValoTheme.BUTTON_SMALL);
         footer.addComponent(showAll);
-        footer.setComponentAlignment(showAll, Alignment.TOP_CENTER);
+        footer.setComponentAlignment(showAll, Alignment.TOP_CENTER);*/
         notificationsLayout.addComponent(footer);
 
         if (notificationsWindow == null) {
@@ -261,11 +259,6 @@ public final class DashboardView extends Panel implements View,
         notificationsButton.updateNotificationsCount(null);
     }
 
-    @Override
-    public void dashboardNameEdited(final String name) {
-        titleLabel.setValue(name);
-    }
-
     public static final class NotificationsButton extends Button {
         private static final String STYLE_UNREAD = "unread";
         public static final String ID = "dashboard-notifications";
@@ -281,8 +274,7 @@ public final class DashboardView extends Panel implements View,
         @Subscribe
         public void updateNotificationsCount(
                 final NotificationsCountUpdatedEvent event) {
-            setUnreadCount(DashboardUI.getDataProvider()
-                    .getUnreadNotificationsCount());
+            setUnreadCount(PatientDataManager.getCountNotifications());
         }
 
         public void setUnreadCount(final int count) {

@@ -5,6 +5,9 @@
  */
 package com.humancare.monitor.snmp;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.humancare.monitor.domain.DashboardNotification;
 import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.entities.Sensor;
@@ -19,6 +22,8 @@ import com.vaadin.ui.TextField;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import org.snmp4j.smi.OID;
@@ -49,17 +54,18 @@ public class PatientDataManager {
 
     // list of patients registered by manager
     private List<RegisteredPatients> registPatientList;
+    
+    private static Collection<DashboardNotification> notifications = new ArrayList();
 
     private int femPatientsNumber;
     private int malePatientsNumber;
 
     private Manager MANAGER = Manager.getInstance();
-
-    protected PatientDataManager() {
-    }
-
-    public static PatientDataManager getInstance() {
-        if (instance == null) {
+    
+    protected PatientDataManager(){}
+    
+    public static PatientDataManager getInstance(){
+        if(instance == null){
             instance = new PatientDataManager();
         }
         return instance;
@@ -202,7 +208,34 @@ public class PatientDataManager {
         }
 
     }
-
+    public static void addNotification(String name, String action, String time, String content){
+        DashboardNotification n1 = new DashboardNotification();
+        n1.setId(1);
+        n1.setFirstName(name);
+        n1.setLastName(" - ");
+        n1.setAction(action);
+        n1.setPrettyTime(time);
+        n1.setContent(content);
+        notifications.add(n1);
+    
+    }
+    
+    public Collection<DashboardNotification> getNotifications(){
+        for(DashboardNotification notification : notifications) {
+            notification.setRead(true);
+        }
+        return Collections.unmodifiableCollection(notifications);     
+    }
+    
+    public static int getCountNotifications(){
+        Predicate<DashboardNotification> unreadPredicate = new Predicate<DashboardNotification>() {
+            @Override
+            public boolean apply(DashboardNotification input) {
+                return !input.isRead();
+            }
+        };
+        return Collections2.filter(notifications, unreadPredicate).size();
+    }
     public RegisteredPatients getCurrentPatient() {
         return currentPatient;
     }

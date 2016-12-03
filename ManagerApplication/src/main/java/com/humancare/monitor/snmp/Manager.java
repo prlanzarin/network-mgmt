@@ -331,4 +331,13 @@ public class Manager {
 
         return sensorList;
     }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }   
+    
 }

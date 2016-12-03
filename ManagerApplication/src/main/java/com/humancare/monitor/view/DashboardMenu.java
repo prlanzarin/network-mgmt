@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import com.google.common.eventbus.Subscribe;
 import com.humancare.monitor.DashboardUI;
-import com.humancare.monitor.component.ProfilePreferencesWindow;
 import com.humancare.monitor.domain.Transaction;
 import com.humancare.monitor.domain.User;
 import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent;
@@ -14,6 +13,7 @@ import com.humancare.monitor.event.DashboardEvent.ReportsCountUpdatedEvent;
 import com.humancare.monitor.event.DashboardEvent.TransactionReportEvent;
 import com.humancare.monitor.event.DashboardEvent.UserLoggedOutEvent;
 import com.humancare.monitor.event.DashboardEventBus;
+import com.humancare.monitor.snmp.PatientDataManager;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptCriterion;
@@ -105,26 +105,7 @@ public final class DashboardMenu extends CustomComponent {
         final User user = getCurrentUser();
         settingsItem = settings.addItem("",
                 new ThemeResource("img/profile-pic-300px.jpg"), null);
-        updateUserName(null);
-        settingsItem.addItem("Edit Profile", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                ProfilePreferencesWindow.open(user, false);
-            }
-        });
-        settingsItem.addItem("Preferences", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                ProfilePreferencesWindow.open(user, true);
-            }
-        });
-        settingsItem.addSeparator();
-        settingsItem.addItem("Sign Out", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                DashboardEventBus.post(new UserLoggedOutEvent());
-            }
-        });
+        updateUserName(null);  
         return settings;
     }
 
@@ -227,8 +208,7 @@ public final class DashboardMenu extends CustomComponent {
     @Subscribe
     public void updateNotificationsCount(
             final NotificationsCountUpdatedEvent event) {
-        int unreadNotificationsCount = DashboardUI.getDataProvider()
-                .getUnreadNotificationsCount();
+        int unreadNotificationsCount = PatientDataManager.getCountNotifications();
         notificationsBadge.setValue(String.valueOf(unreadNotificationsCount));
         notificationsBadge.setVisible(unreadNotificationsCount > 0);
     }

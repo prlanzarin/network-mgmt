@@ -9,6 +9,7 @@ import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.entities.RegisteredPatients;
 import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
+import com.humancare.monitor.snmp.PatientDataValidator;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisTitle;
 import com.vaadin.addon.charts.model.AxisType;
@@ -19,6 +20,7 @@ import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.DateTimeLabelFormats;
 import com.vaadin.addon.charts.model.PlotOptionsSpline;
 import com.vaadin.addon.charts.model.YAxis;
+import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.server.Page;
 import com.vaadin.server.data.ListDataSource;
 import com.vaadin.ui.Button;
@@ -84,6 +86,7 @@ public class DashboardCharts {
     private List<PatientData> filteredData;
     private ComboBox<RegisteredPatients> patientSelect;
     private Manager manager = Manager.getInstance();
+    private PatientDataValidator validate = new PatientDataValidator();
 
     private static DashboardCharts instance = null;
 
@@ -224,6 +227,9 @@ public class DashboardCharts {
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getHeartRate());
             // add item, select updateChartImmediately option
+            if(validate.heartRateAlert(p.getHeartRate())){
+                item.setColor(SolidColor.RED);
+            }
             hrData.add(item, true, false);
         }
 
@@ -262,6 +268,9 @@ public class DashboardCharts {
     public void updateSPO2Data() {
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getSPO2());
+            if(validate.spo2Alert(p.getSPO2())){
+                item.setColor(SolidColor.RED);
+            }
             // add item, select updateChartImmediately option
             spo2Data.add(item, true, false);
         }
@@ -299,7 +308,15 @@ public class DashboardCharts {
 
     public void updatePressureData() {
         for (PatientData p : filteredData) {
-            DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getBloodPressure());
+            Integer pressure = p.getBloodPressure();      
+            DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), pressure);
+            
+            int sistolic = Integer.parseInt(pressure.toString().substring(0, 3));
+            int diastolic = Integer.parseInt(pressure.toString().substring(3, 5));         
+            
+            if(validate.pressureAlert(sistolic, diastolic)){
+                item.setColor(SolidColor.RED);
+            }
             // add item, select updateChartImmediately option
             pressureData.add(item, true, false);
         }
@@ -338,6 +355,9 @@ public class DashboardCharts {
     public void updateGlucoseData() {
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getBloodGlucose());
+            if(validate.glucoseAlert(p.getBloodGlucose())){
+                item.setColor(SolidColor.RED);
+            }
             // add item, select updateChartImmediately option
             glucoseData.add(item, true, false);
         }
@@ -381,7 +401,7 @@ public class DashboardCharts {
         }
     }
 
-    protected Component getEnvLuminosityChart() {
+    protected Component getEnvHumidityChart() {
         envHumidityChart = new Chart();
         envHumidityChart.setHeight("350px");
         envHumidityChart.setWidth("33%");
@@ -413,7 +433,17 @@ public class DashboardCharts {
 
     public void updateEnvHumidityData() {
         for (PatientData p : filteredData) {
-            DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getEnvHumidity());
+            int humidity = p.getEnvHumidity();
+            DataSeriesItem item = new DataSeriesItem(System.currentTimeMillis(), humidity);
+            if(humidity < 30){
+                if(humidity > 20){
+                    item.setColor(SolidColor.YELLOW);
+                }else if(humidity > 12){
+                    item.setColor(SolidColor.RED);
+                }else{
+                    item.setColor(SolidColor.BLACK);
+                }        
+            }
             // add item, select updateChartImmediately option
             envHumidityData.add(item, true, false);
         }
@@ -426,14 +456,14 @@ public class DashboardCharts {
 
         envOxyConfig = envOxyChart.getConfiguration();
         envOxyConfig.getChart().setType(ChartType.SPLINE);
-        envOxyConfig.getTitle().setText("Enviroment Humidity");
+        envOxyConfig.getTitle().setText("Enviroment Oxygen");
         envOxyConfig.getTooltip().setFormatter("");
         envOxyConfig.getxAxis().setType(AxisType.DATETIME);
         envOxyConfig.getxAxis().setDateTimeLabelFormats(
             new DateTimeLabelFormats("%H %a", "%H"));
 
         YAxis yAxis = envOxyConfig.getyAxis();
-        yAxis.setTitle(new AxisTitle("Enviroment Humidity (%)"));
+        yAxis.setTitle(new AxisTitle("Enviroment Oxygen (%)"));
 
         envOxyConfig.getTooltip().setFormatter(
             "'<b>'+ this.series.name +'</b><br/>\'+ Highcharts.dateFormat('%H %a', this.x) +': '+ this.y +' %'");
@@ -452,7 +482,7 @@ public class DashboardCharts {
 
     public void updateEnvOxyData() {
         for (PatientData p : filteredData) {
-            DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getEnvHumidity());
+            DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getEnvOxygen());
             // add item, select updateChartImmediately option
             envOxyData.add(item, true, false);
         }
