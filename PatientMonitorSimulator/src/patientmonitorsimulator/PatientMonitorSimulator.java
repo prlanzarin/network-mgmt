@@ -115,7 +115,13 @@ public class PatientMonitorSimulator extends JFrame{
         
         pressure.setToolTipText("mmHg (ex: 120/80 format: 12080)");
         temperature.setToolTipText("ºC (ex: 36,8  format: 368)");
-        envTemperature.setToolTipText("ºC (ex: 36,8  format: 368)");
+        envTemperature.setToolTipText("ºC Integer (ex: 36,8  format: 37)");
+        glucose.setToolTipText("mg/dL (ex: 80 mg/dL format: 80");
+        oxygen.setToolTipText("% (ex: 90% format: 90)");
+        heartRate.setToolTipText("bpm (ex: 60 bpm format: 60)");
+        envHumidity.setToolTipText("% (ex: 40% format: 40)");
+        latitude.setToolTipText("30.0346 °S format: 300346");
+        longitude.setToolTipText("51.2177° W format: 512177");
         
         optionF.setText("F");
         optionM.setText("M");
