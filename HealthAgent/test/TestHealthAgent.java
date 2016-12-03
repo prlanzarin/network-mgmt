@@ -1,5 +1,8 @@
 import agent.HealthAgent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import utils.Constants;
 
@@ -28,17 +31,11 @@ public class TestHealthAgent {
     }
 
     private void init() throws IOException {
-        agent = new HealthAgent("udp:0.0.0.0/2001");
+        InputStream simulation = new FileInputStream("/home/prlanzarin/github/network-mgmt/PatientMonitorSimulator/patientData.txt");
+        agent = new HealthAgent("udp:0.0.0.0/2001", simulation);
         agent.start();
 
-        System.out.println("This agent is surely running, boyo!");
-        // Setup the client to use our newly started agent
-        client = new SNMPManager("udp:127.0.0.1/2001");
-        // Set value
-        //System.out.println(client.set(Constants.usrName, new OctetString("Michel Temer")).getResponse());
-        // Get back Value which is set
-        //System.out.println("GET: " + client.getAsString(Constants.usrName));
-        System.out.println("GETBULK: " + client.getBulk(Constants.hcSensorEntry, 11));
+        System.out.println("This agent is running at address");
     }
 
 }

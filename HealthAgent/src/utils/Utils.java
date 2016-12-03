@@ -1,5 +1,8 @@
 package utils;
 
+import agent.HealthAgent;
+import agent.model.ScalarMOCreator;
+import java.util.HashMap;
 import net.percederberg.mibble.MibSymbol;
 import net.percederberg.mibble.MibValue;
 import net.percederberg.mibble.MibValueSymbol;
@@ -33,7 +36,9 @@ public final class Utils {
     }
 
     /**
-     * Auxiliary method for converting Mibble access modes to SNMP4J access modes.
+     * Auxiliary method for converting Mibble access modes to SNMP4J access
+     * modes.
+     *
      * @param mode SnmpAccess mibble
      * @return MOAccess snmp4j
      */
@@ -52,51 +57,15 @@ public final class Utils {
         }
     }
 
-    public static Variable genAccelerometerData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Variable genOctetScalarData(OID oid, HashMap<OID, String> simulationData) {
+        return new ScalarMOCreator.getVariable(simulationData.get(oid), "OCTET STRING");
     }
 
-    public static Variable genEnvOxygenData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Variable genIntegerScalarData(OID oid, HashMap<OID, String> simulationData) {
+        return new ScalarMOCreator.getVariable(simulationData.get(oid), "INTEGER");
     }
 
-    public static Variable genLumData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genEnvTempData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genHumidityData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genSaturationData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genGlucoseData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genLeadData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genRateData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genBdTemperatureData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genBloodPressureData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public static Variable genLocationData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Variable genGaugeScalarData(OID oid, HashMap<OID, String> simulationData) {
+        return new ScalarMOCreator.getVariable(simulationData.get(oid), "Gauge");
     }
 }

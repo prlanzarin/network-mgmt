@@ -36,7 +36,7 @@ public class ScalarMOCreator {
      * @param type
      * @return
      */
-    private static Variable getVariable(Object value, String type) {
+    public static Variable getVariable(Object value, String type) {
         switch (type) {
             case "OCTET STRING":
                 return new OctetString(value != null ? "" : "");

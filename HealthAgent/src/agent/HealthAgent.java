@@ -1,14 +1,22 @@
 package agent;
 
 import agent.model.MibContainer;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.percederberg.mibble.MibSymbol;
 import net.percederberg.mibble.MibType;
 import net.percederberg.mibble.MibValueSymbol;
@@ -40,14 +48,29 @@ import utils.Utils;
 
 public class HealthAgent extends TestAgent {
 
-    private final String address;
+    private static String address = null;
     private static final String CONF_FILE = "conf.agent";
     private static final String BOOT_COUNTER_FILE = "bootCounter.agent";
+    public static InputStream simulation = null;
+    public static HashMap simulationData = null;
     /* MUST NOT FORGET TO LOAD PARENT MIB FIRST (XYZCorp) */
     private static final String MIB_FILE = "../HUMAN-CARE-MIB.mib";
     /* MIB MANAGEMENT CONTAINER USING MIBBLE */
     private MibContainer mib = null;
     final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+    /**
+     *
+     * @param address mib network address (localhost for tests)
+     * @throws IOException
+     */
+    public HealthAgent(String address, InputStream simulation) throws IOException {
+        super(new File(CONF_FILE), new File(BOOT_COUNTER_FILE));
+        this.simulation = simulation;
+        this.address = address;
+        this.mib = new MibContainer(MIB_FILE);
+        this.simulationData = new HashMap<OID, String>();
+    }
 
     /**
      *
@@ -162,13 +185,27 @@ public class HealthAgent extends TestAgent {
         run();
         sendColdStartNotification();
 
-        // getting info from simulation file
-        //this.executorService.scheduleAtFixedRate(new Runnable() {
-        //    @Override
-        //    public void run() {
-        //        generateMibData();
-        //    }
-        //}, 0, 2, TimeUnit.MILLISECONDS);
+        //getting info from simulation file
+        if (simulation != null) {
+
+            this.executorService.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+
+                    InputStream buffer = new BufferedInputStream(simulation);
+                    ObjectInput input = null;
+                    try {
+                        input = new ObjectInputStream(buffer);
+                    } catch (IOException ex) {
+                        Logger.getLogger(HealthAgent.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    if (input != null) {
+                        generateMibData(buffer, input);
+                    }
+                }
+            }, 0, 2, TimeUnit.MILLISECONDS
+            );
+        }
     }
 
     public MibContainer getMibContainer() {
@@ -200,9 +237,17 @@ public class HealthAgent extends TestAgent {
      * MO's values.
      *
      */
-    private void generateMibData() {
+    private void generateMibData(InputStream buffer, ObjectInput input) {
         HashMap scalarMappings = mib.getScalarMappings();
         SortedSet<String> mibOids = mib.getOids();
+
+        try {
+            simulationData = (HashMap<OID, String>) input.readObject();
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException("Error reading sim data");
+        } catch (IOException ex) {
+            throw new RuntimeException("Error reading sim data");
+        }
 
         Iterator entries = scalarMappings.entrySet().iterator();
         while (entries.hasNext()) {
@@ -211,33 +256,33 @@ public class HealthAgent extends TestAgent {
             MOScalar smo = (MOScalar) thisEntry.getValue();
 
             if (oid.equals(Constants.bdBloodPressure)) {
-                mib.updateScalar(smo, Utils.genBloodPressureData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             } else if (oid.equals(Constants.usrLatitude)
                 || oid.equals(Constants.usrLongitude)) {
-                mib.updateScalar(smo, Utils.genLocationData());
+                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
             } else if (oid.equals(Constants.usrOrientationX)
                 || oid.equals(Constants.usrOrientationY)
                 || oid.equals(Constants.usrOrientationZ)) {
-                mib.updateScalar(smo, Utils.genAccelerometerData());
+                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
             } else if (oid.equals(Constants.bdTemperature)) {
-                mib.updateScalar(smo, Utils.genBdTemperatureData());
+                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
             } else if (oid.equals(Constants.bdHeartRate)) {
-                mib.updateScalar(smo, Utils.genRateData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             } else if (oid.equals(Constants.bdHeartRhythmLeadI)
                 || oid.equals(Constants.bdHeartRhythmLeadII)) {
-                mib.updateScalar(smo, Utils.genLeadData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             } else if (oid.equals(Constants.bdBloodGlucose)) {
-                mib.updateScalar(smo, Utils.genGlucoseData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             } else if (oid.equals(Constants.bdBloodOxygenSaturation)) {
-                mib.updateScalar(smo, Utils.genSaturationData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             } else if (oid.equals(Constants.envHumidity)) {
-                mib.updateScalar(smo, Utils.genHumidityData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             } else if (oid.equals(Constants.envTemperature)) {
-                mib.updateScalar(smo, Utils.genEnvTempData());
+                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
             } else if (oid.equals(Constants.envLuminosity)) {
-                mib.updateScalar(smo, Utils.genLumData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             } else if (oid.equals(Constants.envOxygen)) {
-                mib.updateScalar(smo, Utils.genEnvOxygenData());
+                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
             }
         }
     }
