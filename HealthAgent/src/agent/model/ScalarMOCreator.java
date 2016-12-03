@@ -13,7 +13,7 @@ import org.snmp4j.smi.Variable;
  * a MIB.
  *
  */
-public class ScalarMOCreator {
+public final class ScalarMOCreator {
 
     /**
      * Creates a new scalar managed object instance value.

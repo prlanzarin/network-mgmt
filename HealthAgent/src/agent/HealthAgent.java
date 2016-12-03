@@ -187,11 +187,9 @@ public class HealthAgent extends TestAgent {
 
         //getting info from simulation file
         if (simulation != null) {
-
             this.executorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-
                     InputStream buffer = new BufferedInputStream(simulation);
                     ObjectInput input = null;
                     try {

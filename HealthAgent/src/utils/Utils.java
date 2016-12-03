@@ -57,15 +57,16 @@ public final class Utils {
         }
     }
 
-    public Variable genOctetScalarData(OID oid, HashMap<OID, String> simulationData) {
-        return new ScalarMOCreator.getVariable(simulationData.get(oid), "OCTET STRING");
+    public static Variable genOctetScalarData(OID oid, HashMap<OID, String> simulationData) {
+        return ScalarMOCreator.getVariable(simulationData.get(oid), "OCTET STRING");
     }
 
-    public Variable genIntegerScalarData(OID oid, HashMap<OID, String> simulationData) {
-        return new ScalarMOCreator.getVariable(simulationData.get(oid), "INTEGER");
+    public static Variable genIntegerScalarData(OID oid, HashMap<OID, String> simulationData) {
+        ScalarMOCreator.getVariable(simulationData.get(oid), "INTEGER");
+        return ScalarMOCreator.getVariable(simulationData.get(oid), "INTEGER");
     }
 
-    public Variable genGaugeScalarData(OID oid, HashMap<OID, String> simulationData) {
-        return new ScalarMOCreator.getVariable(simulationData.get(oid), "Gauge");
+    public static Variable genGaugeScalarData(OID oid, HashMap<OID, String> simulationData) {
+        return ScalarMOCreator.getVariable(simulationData.get(oid), "Gauge");
     }
 }
