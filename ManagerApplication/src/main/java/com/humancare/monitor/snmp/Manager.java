@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
@@ -65,9 +66,8 @@ public class Manager {
         return instance;
     }
 
-    public void configManager(String add) {
-        address = "udp:" + add + "/2001";
-        //Manager client = new Manager("udp:127.0.0.1/161");
+    public void configManager(String add, Integer port) {
+        address = "udp:" + add + "/" + port;
     }
 
     /**
@@ -95,18 +95,21 @@ public class Manager {
      * @throws IOException
      */
     public ResponseEvent get(OID oids[]) throws IOException {
+        Target target = getTarget(PUBLIC_COMMUNITY);
+        if (target == null) {
+            return null;
+        }
         PDU pdu = new PDU();
         for (OID oid : oids) {
             pdu.add(new VariableBinding(oid));
         }
         pdu.setType(PDU.GET);
-         pdu.setRequestID(new Integer32(requestID++));
-        ResponseEvent event = snmp.get(pdu, getTarget(PUBLIC_COMMUNITY));
+        pdu.setRequestID(new Integer32(requestID++));
+        ResponseEvent event = snmp.get(pdu, target);
         if (event != null) {
             return event;
         }
-
-        throw new RuntimeException("GET timed out");
+        return null;
     }
 
     /**
@@ -117,16 +120,17 @@ public class Manager {
      * @return
      * @throws IOException
      */
-    public ResponseEvent getBulk(OID oids[], int maxRepetitions) throws IOException {
-        PDU pdu = new PDU();
-        for (OID oid : oids) {
-            pdu.add(new VariableBinding(oid));
+    public ResponseEvent getBulk(OID oid, int maxRepetitions) throws IOException {
+        Target target = getTarget(PUBLIC_COMMUNITY);
+        if (target == null) {
+            return null;
         }
+        PDU pdu = new PDU();
         pdu.setType(PDU.GETBULK);
         pdu.setMaxRepetitions(maxRepetitions);
         pdu.setNonRepeaters(0);
 
-        ResponseEvent event = snmp.getBulk(pdu, getTarget(PUBLIC_COMMUNITY));
+        ResponseEvent event = snmp.getBulk(pdu, target);
         if (event != null) {
             return event;
         }
@@ -144,6 +148,9 @@ public class Manager {
      */
     public ResponseEvent set(OID oid, String value) throws IOException {
         Target target = getTarget(PUBLIC_COMMUNITY);
+        if (target == null) {
+            return null;
+        }
         // Create the PDU object
         PDU pdu = new PDU();
         Variable var = new OctetString(value);
@@ -165,6 +172,9 @@ public class Manager {
      */
     public ResponseEvent set(OID oid, Integer value) throws IOException {
         Target target = getTarget(PUBLIC_COMMUNITY);
+        if (target == null) {
+            return null;
+        }
         // Create the PDU object
         PDU pdu = new PDU();
         Variable var = new Integer32(value);
@@ -186,6 +196,8 @@ public class Manager {
      * @return
      */
     private Target getTarget(String community) {
+        if(address == null)
+            return null;
         Address targetAddress = GenericAddress.parse(address);
         CommunityTarget target = new CommunityTarget();
         target.setCommunity(new OctetString(community));
@@ -278,31 +290,45 @@ public class Manager {
         return patientData;
     }
 
-    public List<Sensor> getSensorInformation(OID[] oids, int maxRepetitions) {
-        List<Sensor> sensorList = new ArrayList<Sensor>();
-        try {
-            ResponseEvent response = getBulk(oids, maxRepetitions);
-            PDU pdu = response.getResponse();
-            int j = 0;
-            for (int i = 0; i < maxRepetitions; i++) {
-                Sensor sensor = new Sensor();
-                sensor.setType(pdu.get(j++).getVariable().toString());
-                sensor.setLocation(pdu.get(j++).getVariable().toString());
-                sensor.setBatteryPower(Integer.parseInt(pdu.get(j++).getVariable().toString()));
-                sensor.setBatteryAlert(Integer.parseInt(pdu.get(j++).getVariable().toString()));
-
-                sensorList.add(sensor);
-            }
-
-        } catch (RuntimeException ex) {
-            System.out.println("Connection time out");
-            ex.printStackTrace();
-            return null;
-        } catch (IOException ex) {
-            System.out.println("Erro ao buscar informaçoes de sensores");
-            ex.printStackTrace();
+    public List<Sensor> getSensorInformation(OID oid, int maxRepetitions) {
+        Target target = getTarget(PUBLIC_COMMUNITY);
+        if (target == null) {
             return null;
         }
+        List<Sensor> sensorList = new ArrayList<Sensor>();
+        ResponseEvent response = null;
+
+        PDU pdu = new PDU();
+        pdu.setType(PDU.GETBULK);
+        pdu.add(new VariableBinding(new OID(oid)));
+        pdu.setMaxRepetitions(maxRepetitions);
+
+        try {
+            response = snmp.getBulk(pdu, target);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            System.out.println("Erro ao buscar informaçoes de sensores");
+            return null;
+        }
+
+        PDU responsePDU = response.getResponse();
+        Vector vec = responsePDU.getVariableBindings();
+        int numberOfSensors = maxRepetitions / Constants.SENSOR_OBJECTS;
+        for (int i = 0; i < numberOfSensors; i++) {
+            Sensor sensor = new Sensor();
+            VariableBinding vbType = (VariableBinding) vec.elementAt(i);
+            VariableBinding vbLocation = (VariableBinding) vec.elementAt(i + (numberOfSensors * 2));
+            VariableBinding vbBatteryPower = (VariableBinding) vec.elementAt(i + (numberOfSensors * 3));
+            VariableBinding vbBatteryAlert = (VariableBinding) vec.elementAt(i + (numberOfSensors * 4));
+            sensor.setType(vbType.getVariable().toString());
+            sensor.setLocation(vbLocation.getVariable().toString());
+            sensor.setBatteryPower(Integer.parseInt(vbBatteryPower.getVariable().toString()));
+            sensor.setBatteryAlert(Integer.parseInt(vbBatteryAlert.getVariable().toString()));
+
+            sensorList.add(sensor);
+        }
+
         return sensorList;
     }
 }

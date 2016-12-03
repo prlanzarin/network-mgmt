@@ -117,7 +117,7 @@ public class SNMPManager {
                 for (int i = 0; i < vec.size(); i++) {
                     VariableBinding vb = null;
                     vb = (VariableBinding) vec.elementAt(i);
-                    //System.out.println(i+ " ---- "+vb.toString()); 
+                    System.out.println(i+ " ---- "+vb.toString()); 
                 }
             }
             return response;

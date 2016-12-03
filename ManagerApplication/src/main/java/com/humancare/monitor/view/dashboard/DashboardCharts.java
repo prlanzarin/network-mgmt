@@ -117,7 +117,8 @@ public class DashboardCharts {
             @Override
             public void buttonClick(final Button.ClickEvent event) {
                 System.out.println(patientSelect.getValue().getIp());
-                manager.configManager(patientSelect.getValue().getIp());
+                manager.configManager(patientSelect.getValue().getIp(), 
+                    patientSelect.getValue().getPort());
                 patientDataManager.setCurrentPatient((RegisteredPatients) patientSelect.getValue());
                 filterDataByDate();
                 refreshAllGraphs();

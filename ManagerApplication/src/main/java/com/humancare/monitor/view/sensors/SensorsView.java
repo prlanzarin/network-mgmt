@@ -5,6 +5,8 @@
  */
 package com.humancare.monitor.view.sensors;
 
+import com.humancare.monitor.entities.Sensor;
+import static com.humancare.monitor.snmp.Constants.OID_S;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -16,6 +18,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.ui.Grid;
+import java.util.List;
 
 /**
  *
@@ -74,23 +77,22 @@ public class SensorsView extends VerticalLayout implements View {
         grid.addColumn("Batery", String.class);
         grid.addColumn("Batery Alert", String.class);       
         
-     /*
         String numberOfsensorsString = patientDataManager.getByOID(OID_S.get("hcSensorNumber"));
         int numberOfSensors = 0;
         if(numberOfsensorsString != null){
             numberOfSensors = Integer.parseInt(numberOfsensorsString);
         }
+        System.out.println("Number of sensors: " + numberOfSensors);
         
         // calls getBulk operation to get sensors data
         List<Sensor> sensors = patientDataManager.getSensors(numberOfSensors);
         
         if(sensors != null && !sensors.isEmpty()){
-            for(Sensor s : sensors){
+            sensors.stream().forEach((s) -> {
                 grid.addRow(s.getType(), s.getLocation(), s.getBatteryPower() + "%", s.getBatteryAlert() == 1 ? "Alert!!" : "-");
-            }
+            });
         }      
-    */   
-        grid.addRow("Teste", "LOcal teste", 80 + "%", "-");
+        //grid.addRow("Teste", "LOcal teste", 80 + "%", "-");
         
         layout.addComponent(grid);
         return layout;

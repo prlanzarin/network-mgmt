@@ -15,6 +15,8 @@ import org.snmp4j.smi.OID;
  */
 public final class Constants {
 
+    public static final int SENSOR_OBJECTS = 5;
+    
     /* humanCare            OBJECT IDENTIFIER ::= { XYZCorp 6 }*/
     public static final OID humanCare = new OID("1.3.6.1.3.57.6");
     

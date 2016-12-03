@@ -17,6 +17,7 @@ public class RegisteredPatients implements Comparable{
     
     private String name;
     private String ip;   
+    private Integer port;
     private Integer age;
     private String gender;
     
@@ -29,9 +30,10 @@ public class RegisteredPatients implements Comparable{
     public RegisteredPatients() {
     }
     
-    public RegisteredPatients(String name, String ip, Integer age, String gender){
+    public RegisteredPatients(String name, String ip, Integer port, Integer age, String gender){
         this.name = name;
         this.ip = ip;
+        this.port = port;
         this.age = age;
         this.gender = gender;
     }
@@ -57,6 +59,14 @@ public class RegisteredPatients implements Comparable{
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+    
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     @Override
