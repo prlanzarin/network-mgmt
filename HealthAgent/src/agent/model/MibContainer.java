@@ -62,7 +62,6 @@ public class MibContainer {
 
         this.setMibMappings(extractOids(this.mib));
         this.oids = new TreeSet<>(mibMappings.keySet());
-        System.out.println(oids);
     }
 
     /**
