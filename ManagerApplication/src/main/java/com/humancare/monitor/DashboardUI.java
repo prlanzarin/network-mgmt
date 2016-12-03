@@ -6,15 +6,12 @@ import com.google.common.eventbus.Subscribe;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Widgetset;
-import com.humancare.monitor.data.DataProvider;
-import com.humancare.monitor.data.dummy.DummyDataProvider;
 import com.humancare.monitor.domain.User;
 import com.humancare.monitor.event.DashboardEvent.BrowserResizeEvent;
 import com.humancare.monitor.event.DashboardEvent.CloseOpenWindowsEvent;
 import com.humancare.monitor.event.DashboardEvent.UserLoggedOutEvent;
 import com.humancare.monitor.event.DashboardEvent.UserLoginRequestedEvent;
 import com.humancare.monitor.event.DashboardEventBus;
-import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.view.LoginView;
 import com.humancare.monitor.view.MainView;
 import com.vaadin.server.Page;
@@ -39,7 +36,6 @@ public final class DashboardUI extends UI {
      * injection; and not in the UI but somewhere closer to where they're
      * actually accessed.
      */
-    private final DataProvider dataProvider = new DummyDataProvider();
     private final DashboardEventBus dashboardEventbus = new DashboardEventBus();
 
     @Override
@@ -85,11 +81,22 @@ public final class DashboardUI extends UI {
 
     @Subscribe
     public void userLoginRequested(final UserLoginRequestedEvent event) {
-        User user = getDataProvider().authenticate(event.getUserName(),
-                event.getPassword());
+        User user = authenticate(event.getUserName(), event.getPassword());
         VaadinSession.getCurrent().setAttribute(User.class.getName(), user);
         updateContent();
     }
+    
+    public User authenticate(String userName, String password) {
+        User user = new User();
+        user.setFirstName("Admin");
+        user.setLastName("");
+        user.setRole("admin");
+        String email = user.getFirstName().toLowerCase() + "@teste.com";
+        user.setLocation("BR");
+        user.setBio("Quis aute iure reprehenderit in voluptate velit esse."
+                + "Cras mattis iudicium purus sit amet fermentum.");
+        return user;
+    } 
 
     @Subscribe
     public void userLoggedOut(final UserLoggedOutEvent event) {
@@ -105,13 +112,6 @@ public final class DashboardUI extends UI {
         for (Window window : getWindows()) {
             window.close();
         }
-    }
-
-    /**
-     * @return An instance for accessing the (dummy) services layer.
-     */
-    public static DataProvider getDataProvider() {
-        return ((DashboardUI) getCurrent()).dataProvider;
     }
 
     public static DashboardEventBus getDashboardEventbus() {

@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import com.google.common.eventbus.Subscribe;
 import com.humancare.monitor.DashboardUI;
-import com.humancare.monitor.component.ProfilePreferencesWindow;
 import com.humancare.monitor.domain.Transaction;
 import com.humancare.monitor.domain.User;
 import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent;
@@ -106,26 +105,7 @@ public final class DashboardMenu extends CustomComponent {
         final User user = getCurrentUser();
         settingsItem = settings.addItem("",
                 new ThemeResource("img/profile-pic-300px.jpg"), null);
-        updateUserName(null);
-        settingsItem.addItem("Edit Profile", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                ProfilePreferencesWindow.open(user, false);
-            }
-        });
-        settingsItem.addItem("Preferences", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                ProfilePreferencesWindow.open(user, true);
-            }
-        });
-        settingsItem.addSeparator();
-        settingsItem.addItem("Sign Out", new Command() {
-            @Override
-            public void menuSelected(final MenuItem selectedItem) {
-                DashboardEventBus.post(new UserLoggedOutEvent());
-            }
-        });
+        updateUserName(null);  
         return settings;
     }
 

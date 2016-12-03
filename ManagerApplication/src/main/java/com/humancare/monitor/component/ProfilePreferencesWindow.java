@@ -257,11 +257,4 @@ public class ProfilePreferencesWindow extends Window {
         return footer;
     }
 
-    public static void open(final User user,
-            final boolean preferencesTabActive) {
-        DashboardEventBus.post(new CloseOpenWindowsEvent());
-        Window w = new ProfilePreferencesWindow(user, preferencesTabActive);
-        UI.getCurrent().addWindow(w);
-        w.focus();
-    }
 }
