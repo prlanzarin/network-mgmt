@@ -37,15 +37,6 @@ public class TableMOCreator {
 		this.tableRootOid = oid;
 	}
 
-	/**
-	 * Adds all column types {@link MOColumn} to this table.
-	 * Important to understand that you must add all types here before
-	 * adding any row values
-	 * 
-	 * @param syntax use {@link SMIConstants}
-	 * @param access
-	 * @return
-	 */
 	public TableMOCreator addColumnType(int syntax, MOAccess access) {
 		colTypeCnt++;
 		columns.add(new MOColumn(colTypeCnt, syntax, access));
