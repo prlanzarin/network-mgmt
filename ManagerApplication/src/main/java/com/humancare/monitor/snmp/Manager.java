@@ -85,7 +85,7 @@ public class Manager {
         try {
             event = get(new OID[]{oid});
         } catch (IOException ex) {
-            ex.printStackTrace();
+            return null;
         }
         return event.getResponse().get(0).getVariable().toString();
     }
@@ -137,7 +137,6 @@ public class Manager {
         if (event != null) {
             return event;
         }
-
         throw new RuntimeException("GETBULK timed out");
     }
 
@@ -199,14 +198,15 @@ public class Manager {
      * @return
      */
     private Target getTarget(String community) {
-        if(address == null)
+        if (address == null) {
             return null;
+        }
         Address targetAddress = GenericAddress.parse(address);
         CommunityTarget target = new CommunityTarget();
         target.setCommunity(new OctetString(community));
         target.setAddress(targetAddress);
         target.setRetries(2);
-        target.setTimeout(1500);
+        target.setTimeout(800);
         target.setVersion(SnmpConstants.version2c);
         return target;
     }
@@ -214,30 +214,12 @@ public class Manager {
     public PatientData getAllPatientInformation(OID[] oids) {
 
         PatientData patientData = new PatientData();
+        ResponseEvent response = null;
         try {
             patientData.setReceivedDateAndTime(System.currentTimeMillis());
-
-            ResponseEvent response = get(oids);
-            if(response.getResponse() != null){
-                PDU pdu = response.getResponse();
-                patientData.setName(pdu.get(0).getVariable().toString());
-                patientData.setAge(pdu.get(1).getVariable().toString());
-                patientData.setGender(pdu.get(2).getVariable().toString());
-                patientData.setLatitute(Double.parseDouble(pdu.get(3).getVariable().toString()));
-                patientData.setLongitude(Double.parseDouble(pdu.get(4).getVariable().toString()));
-                patientData.setX(Double.parseDouble(pdu.get(5).getVariable().toString()));
-                patientData.setY(Double.parseDouble(pdu.get(6).getVariable().toString()));
-                patientData.setZ(Double.parseDouble(pdu.get(7).getVariable().toString()));
-                patientData.setBloodPressure(Integer.parseInt(pdu.get(8).getVariable().toString()));
-                patientData.setTemperature(Double.parseDouble(pdu.get(9).getVariable().toString()) / 10.0);
-                patientData.setHeartRate(Integer.parseInt(pdu.get(10).getVariable().toString()));
-                patientData.setBloodGlucose(Integer.parseInt(pdu.get(11).getVariable().toString()));
-                patientData.setSPO2(Integer.parseInt(pdu.get(12).getVariable().toString()));
-            }
-
+            response = get(oids);
         } catch (RuntimeException ex) {
-            System.out.println("Connection time out");            
-            ex.printStackTrace();
+            System.out.println("Connection time out");
             return null;
         } catch (IOException ex) {
             System.out.println("Error to find patient information");
@@ -245,30 +227,47 @@ public class Manager {
             return null;
         }
 
+        if (response != null && response.getResponse() != null) {
+            PDU pdu = response.getResponse();
+            patientData.setName(pdu.get(0).getVariable().toString());
+            patientData.setAge(pdu.get(1).getVariable().toString());
+            patientData.setGender(pdu.get(2).getVariable().toString());
+            patientData.setLatitute(Double.parseDouble(pdu.get(3).getVariable().toString()));
+            patientData.setLongitude(Double.parseDouble(pdu.get(4).getVariable().toString()));
+            patientData.setX(Double.parseDouble(pdu.get(5).getVariable().toString()));
+            patientData.setY(Double.parseDouble(pdu.get(6).getVariable().toString()));
+            patientData.setZ(Double.parseDouble(pdu.get(7).getVariable().toString()));
+            patientData.setBloodPressure(Integer.parseInt(pdu.get(8).getVariable().toString()));
+            patientData.setTemperature(Double.parseDouble(pdu.get(9).getVariable().toString()) / 10.0);
+            patientData.setHeartRate(Integer.parseInt(pdu.get(10).getVariable().toString()));
+            patientData.setBloodGlucose(Integer.parseInt(pdu.get(11).getVariable().toString()));
+            patientData.setSPO2(Integer.parseInt(pdu.get(12).getVariable().toString()));
+        }
+
         return patientData;
     }
 
     public PatientData getEnvInformation(OID[] oids, PatientData patientData) {
+        PDU pdu = null;
         try {
-
             ResponseEvent response = get(oids);
-            PDU pdu = response.getResponse();
-
+            pdu = response.getResponse();
+        } catch (RuntimeException ex) {
+            System.out.println("Connection time out");
+            return null;
+        } catch (IOException ex) {
+            System.out.println("Error to find envoriment information");
+            return null;
+        }
+        if (pdu != null) {
             patientData.setEnvHumidity(Integer.parseInt(pdu.get(0).getVariable().toString()));
             patientData.setEnvTemperature(Integer.parseInt(pdu.get(1).getVariable().toString()));
             patientData.setEnvLuminosity(Integer.parseInt(pdu.get(2).getVariable().toString()));
             patientData.setEnvOxygen(Integer.parseInt(pdu.get(3).getVariable().toString()));
             patientData.setEnvAlarm(pdu.get(4).getVariable().toString().equals("SIM"));
-
-        } catch (RuntimeException ex) {
-            System.out.println("Connection time out");
-            ex.printStackTrace();
-            return null;
-        } catch (IOException ex) {
-            System.out.println("Error to find envoriment information");
-            ex.printStackTrace();
-            return null;
         }
+        else
+            return null;
 
         return patientData;
     }
@@ -283,11 +282,9 @@ public class Manager {
 
         } catch (RuntimeException ex) {
             System.out.println("Connection time out");
-            ex.printStackTrace();
             return null;
         } catch (IOException ex) {
             System.out.println("Error to find network information");
-            ex.printStackTrace();
             return null;
         }
 
@@ -310,7 +307,7 @@ public class Manager {
         try {
             response = snmp.getBulk(pdu, target);
         } catch (RuntimeException ex) {
-            ex.printStackTrace();
+            System.out.println("Connection time out");
         } catch (IOException ex) {
             System.out.println("Erro ao buscar informaçoes de sensores");
             return null;
@@ -342,6 +339,6 @@ public class Manager {
 
     public void setAddress(String address) {
         this.address = address;
-    }   
-    
+    }
+
 }
