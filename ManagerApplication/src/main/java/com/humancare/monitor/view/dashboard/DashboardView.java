@@ -147,8 +147,9 @@ public final class DashboardView extends Panel implements View {
         toolbar.addStyleName("daysSelector");
         toolbar.setSpacing(true);
         
-        List<Integer> availableDays = Arrays.asList(7, 30, 60);        
+        List<Integer> availableDays = Arrays.asList(1,7,14,30,60,90,365);        
         daysSelect = new ComboBox<>();
+        daysSelect.setTextInputAllowed(true);
         daysSelect.setDataSource(new ListDataSource<>(availableDays));
         daysSelect.setCaption("Consulting days: ");
         daysSelect.setHeight("30px");

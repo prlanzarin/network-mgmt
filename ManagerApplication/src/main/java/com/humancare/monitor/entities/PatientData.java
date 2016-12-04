@@ -44,7 +44,6 @@ public class PatientData {
     public void setReceivedDateAndTime(Long receivedDateAndTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");    
         Date resultdate = new Date(receivedDateAndTime);
-        System.out.println(sdf.format(resultdate));
         this.receivedDateAndTime = resultdate;
     }    
 

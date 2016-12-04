@@ -89,7 +89,9 @@ public class Manager {
         } catch (IOException ex) {
             return null;
         }
-        return event.getResponse().get(0).getVariable().toString();
+        if(event!= null && event.getResponse() != null && event.getResponse().getErrorStatus() == 0)
+            return event.getResponse().get(0).getVariable().toString();
+        return "0";        
     }
 
     /**
@@ -111,10 +113,7 @@ public class Manager {
         pdu.setType(PDU.GET);
         pdu.setRequestID(new Integer32(requestID++));
         ResponseEvent event = snmp.get(pdu, target);
-        if (event != null) {
-            return event;
-        }
-        return null;
+        return event;
     }
 
     /**
@@ -241,7 +240,7 @@ public class Manager {
             return null;
         }
 
-        if (response != null && response.getResponse() != null) {
+        if (response != null && response.getResponse() != null && response.getResponse().getErrorStatus() == 0) {
             PDU pdu = response.getResponse();
             patientData.setName(pdu.get(0).getVariable().toString());
             patientData.setAge(pdu.get(1).getVariable().toString());
@@ -273,16 +272,13 @@ public class Manager {
             System.out.println("Error to find environment information");
             return null;
         }
-        if (pdu != null) {
+        if (pdu != null && pdu.getErrorStatus() == 0) {
             patientData.setEnvHumidity(Integer.parseInt(pdu.get(0).getVariable().toString()));
             patientData.setEnvTemperature(Integer.parseInt(pdu.get(1).getVariable().toString()));
             patientData.setEnvLuminosity(Integer.parseInt(pdu.get(2).getVariable().toString()));
             patientData.setEnvOxygen(Integer.parseInt(pdu.get(3).getVariable().toString()));
             patientData.setEnvAlarm(pdu.get(4).getVariable().toString().equals("SIM"));
-        } else {
-            return null;
-        }
-
+        } 
         return patientData;
     }
 
@@ -291,8 +287,10 @@ public class Manager {
 
             ResponseEvent response = get(oids);
             PDU pdu = response.getResponse();
-            patientData.setNwType(pdu.get(0).getVariable().toString());
-            patientData.setNwSpeed(pdu.get(1).getVariable().toString());
+            if(pdu != null && pdu.getErrorStatus() != 0){
+                patientData.setNwType(pdu.get(0).getVariable().toString());
+                patientData.setNwSpeed(pdu.get(1).getVariable().toString());
+            }
 
         } catch (RuntimeException ex) {
             System.out.println("  [GET-NET] Connection time out");
@@ -326,22 +324,23 @@ public class Manager {
             System.out.println("Erro ao buscar informaçoes de sensores");
             return null;
         }
+        if(response !=null && response.getResponse().getErrorStatus() == 0){
+            PDU responsePDU = response.getResponse();
+            Vector vec = responsePDU.getVariableBindings();
+            int numberOfSensors = maxRepetitions / Constants.SENSOR_OBJECTS;
+            for (int i = 0; i < numberOfSensors; i++) {
+                Sensor sensor = new Sensor();
+                VariableBinding vbType = (VariableBinding) vec.elementAt(i);
+                VariableBinding vbLocation = (VariableBinding) vec.elementAt(i + (numberOfSensors * 2));
+                VariableBinding vbBatteryPower = (VariableBinding) vec.elementAt(i + (numberOfSensors * 3));
+                VariableBinding vbBatteryAlert = (VariableBinding) vec.elementAt(i + (numberOfSensors * 4));
+                sensor.setType(vbType.getVariable().toString());
+                sensor.setLocation(vbLocation.getVariable().toString());
+                sensor.setBatteryPower(Integer.parseInt(vbBatteryPower.getVariable().toString()));
+                sensor.setBatteryAlert(Integer.parseInt(vbBatteryAlert.getVariable().toString()));
 
-        PDU responsePDU = response.getResponse();
-        Vector vec = responsePDU.getVariableBindings();
-        int numberOfSensors = maxRepetitions / Constants.SENSOR_OBJECTS;
-        for (int i = 0; i < numberOfSensors; i++) {
-            Sensor sensor = new Sensor();
-            VariableBinding vbType = (VariableBinding) vec.elementAt(i);
-            VariableBinding vbLocation = (VariableBinding) vec.elementAt(i + (numberOfSensors * 2));
-            VariableBinding vbBatteryPower = (VariableBinding) vec.elementAt(i + (numberOfSensors * 3));
-            VariableBinding vbBatteryAlert = (VariableBinding) vec.elementAt(i + (numberOfSensors * 4));
-            sensor.setType(vbType.getVariable().toString());
-            sensor.setLocation(vbLocation.getVariable().toString());
-            sensor.setBatteryPower(Integer.parseInt(vbBatteryPower.getVariable().toString()));
-            sensor.setBatteryAlert(Integer.parseInt(vbBatteryAlert.getVariable().toString()));
-
-            sensorList.add(sensor);
+                sensorList.add(sensor);
+            }
         }
 
         return sensorList;

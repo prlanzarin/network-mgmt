@@ -69,7 +69,6 @@ public class StatisticsChart {
             Collections.sort(patientDataManager.getPatientList());
             
             for(RegisteredPatients p: patientDataManager.getPatientList()){
-                System.out.println(p.getAge());
                 if(!p.getGlucoseAlertFrequency().isEmpty()){
                     patientWithGlucoseAlert.add(p);
                 }
