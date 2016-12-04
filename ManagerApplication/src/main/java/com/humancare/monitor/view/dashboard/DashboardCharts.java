@@ -180,6 +180,7 @@ public class DashboardCharts {
     }
 
     public void updateTemperatureData() {
+        temperatureData.clear();
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getTemperature());
             if(validate.tempAlert(p.getTemperature())){
@@ -227,6 +228,7 @@ public class DashboardCharts {
     * Method that feeds heart rate dataSeries chart
      */
     public void updateHeartRatedata() {
+        hrData.clear();
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getHeartRate());
             // add item, select updateChartImmediately option
@@ -269,6 +271,7 @@ public class DashboardCharts {
     }
 
     public void updateSPO2Data() {
+        spo2Data.clear();
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getSPO2());
             if(validate.spo2Alert(p.getSPO2())){
@@ -310,6 +313,7 @@ public class DashboardCharts {
     }
 
     public void updatePressureData() {
+        pressureData.clear();
         for (PatientData p : filteredData) {
             Integer pressure = p.getBloodPressure();      
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), pressure);
@@ -356,6 +360,7 @@ public class DashboardCharts {
     }
 
     public void updateGlucoseData() {
+        glucoseData.clear();
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getBloodGlucose());
             if(validate.glucoseAlert(p.getBloodGlucose())){
@@ -397,6 +402,7 @@ public class DashboardCharts {
     }
 
     public void updateEnvTempData() {
+        envTempData.clear();
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getEnvTemperature());
             // add item, select updateChartImmediately option
@@ -435,6 +441,7 @@ public class DashboardCharts {
     }
 
     public void updateEnvHumidityData() {
+        envHumidityData.clear();
         for (PatientData p : filteredData) {
             int humidity = p.getEnvHumidity();
             DataSeriesItem item = new DataSeriesItem(System.currentTimeMillis(), humidity);
@@ -484,6 +491,7 @@ public class DashboardCharts {
     }
 
     public void updateEnvOxyData() {
+        envOxyData.clear();
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getEnvOxygen());
             // add item, select updateChartImmediately option

@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.google.common.eventbus.Subscribe;
 import com.humancare.monitor.DashboardUI;
 import com.humancare.monitor.domain.DashboardNotification;
+import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.event.DashboardEvent.CloseOpenWindowsEvent;
 import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import com.humancare.monitor.event.DashboardEventBus;
@@ -100,7 +101,8 @@ public final class DashboardView extends Panel implements View {
                     while(true){                    
                         Thread.sleep(1000);   
                         if(manager.getAddress() != null){
-                            patientDataManager.getAllPatientInfo();                            
+                            patientDataManager.getAllPatientInfo();       
+                            patientDataManager.getEnvInfo();
                             Thread.sleep(10000);                             
                         }
                     }
