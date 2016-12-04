@@ -244,7 +244,6 @@ public class HealthAgent extends TestAgent {
      */
     private void generateMibData(InputStream buffer, ObjectInput input) {
         HashMap scalarMappings = mib.getScalarMappings();
-        SortedSet<String> mibOids = mib.getOids();
 
         try {
             simulationData = (HashMap<OID, String>) input.readObject();

@@ -202,18 +202,41 @@ public class MibContainer {
             .addColumnType(SMIConstants.SYNTAX_INTEGER, MOAccessImpl.ACCESS_READ_ONLY)
             // sensor x
             .addRowValue(new Integer32(1))
-            .addRowValue(new Integer32(5))
-            .addRowValue(new OctetString(""))
-            .addRowValue(new Gauge32(10000000))
-            .addRowValue(new Integer32(1500))
+            .addRowValue(new Integer32(1))
+            .addRowValue(new OctetString("Body"))
+            .addRowValue(new Gauge32(100))
+            .addRowValue(new Integer32(0))
             // sensor y
             .addRowValue(new Integer32(2))
+            .addRowValue(new Integer32(2))
+            .addRowValue(new OctetString("Body"))
+            .addRowValue(new Gauge32(100))
+            .addRowValue(new Integer32(0))
+            // sensor z
+            .addRowValue(new Integer32(3))
+            .addRowValue(new Integer32(3))
+            .addRowValue(new OctetString("Body"))
+            .addRowValue(new Gauge32(100))
+            .addRowValue(new Integer32(0))
+            // sensor w
             .addRowValue(new Integer32(4))
-            .addRowValue(new OctetString(""))
-            .addRowValue(new Gauge32(10000000))
-            .addRowValue(new Integer32(1500));
-        //agent.registerManagedObject(new ManagedObject);
+            .addRowValue(new Integer32(4))
+            .addRowValue(new OctetString("Body"))
+            .addRowValue(new Gauge32(100))
+            .addRowValue(new Integer32(0))
+            // sensor v
+            .addRowValue(new Integer32(5))
+            .addRowValue(new Integer32(5))
+            .addRowValue(new OctetString("Body"))
+            .addRowValue(new Gauge32(100))
+            .addRowValue(new Integer32(0));
+        
+        // set sensor table
         this.sensorTable = sensorTableFactory.build();
+        // update sensor number
+        MOScalar smo = (MOScalar) scalarMappings.get(Constants.hcSensorNumber);
+        smo.setValue(ScalarMOCreator.getVariable(5, "Gauge"));
+        
         agent.registerManagedObject(this.sensorTable);
     }
 
