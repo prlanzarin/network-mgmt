@@ -28,6 +28,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import static com.vaadin.ui.Notification.TYPE_HUMANIZED_MESSAGE;
 import com.vaadin.ui.themes.ValoTheme;
@@ -87,6 +88,7 @@ public class DashboardCharts {
     private ComboBox<RegisteredPatients> patientSelect;
     private Manager manager = Manager.getInstance();
     private PatientDataValidator validate = new PatientDataValidator();
+    private Label name;
 
     private static DashboardCharts instance = null;
 
@@ -123,6 +125,7 @@ public class DashboardCharts {
                 manager.configManager(patientSelect.getValue().getIp(), 
                     patientSelect.getValue().getPort());
                 patientDataManager.setCurrentPatient((RegisteredPatients) patientSelect.getValue());
+                name.setValue(patientDataManager.getCurrentPatient().getName() +" - " + patientDataManager.getCurrentPatient().getAge() + " years old");
                 filterDataByDate();
                 refreshAllGraphs();
                 Notification notif = new Notification("Patient "
@@ -543,6 +546,14 @@ public class DashboardCharts {
 
     public void setNumberOfDays(int numberOfDays) {
         this.numberOfDays = numberOfDays;
+    }
+
+    Component getPatientName() {
+        name = new Label();
+        name.addStyleName(ValoTheme.LABEL_H3);
+        name.addStyleName(ValoTheme.LABEL_COLORED);
+        name.addStyleName(ValoTheme.LABEL_BOLD);
+        return name;
     }
 
 }
