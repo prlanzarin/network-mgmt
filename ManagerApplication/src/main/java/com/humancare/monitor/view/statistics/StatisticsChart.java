@@ -147,6 +147,7 @@ public class StatisticsChart {
         XAxis x = new XAxis();
         x.setType(AxisType.CATEGORY);
         averageHRConfig.addxAxis(x);
+        x.setTitle("Age");
 
         YAxis y = new YAxis();
         y.setTitle("Number of alerts");
@@ -201,6 +202,7 @@ public class StatisticsChart {
         XAxis x = new XAxis();
         x.setType(AxisType.CATEGORY);
         averageTemperature.addxAxis(x);
+        x.setTitle("Age");
 
         YAxis y = new YAxis();
         y.setTitle("Number of alerts");
@@ -256,6 +258,7 @@ public class StatisticsChart {
         XAxis x = new XAxis();
         x.setType(AxisType.CATEGORY);
         averagePressureConfig.addxAxis(x);
+        x.setTitle("Age");
 
         YAxis y = new YAxis();
         y.setTitle("Number of alerts");
@@ -310,6 +313,7 @@ public class StatisticsChart {
         XAxis x = new XAxis();
         x.setType(AxisType.CATEGORY);
         averageGlucoseConfig.addxAxis(x);
+        x.setTitle("Age");
 
         YAxis y = new YAxis();
         y.setTitle("Number of alerts");
@@ -364,6 +368,7 @@ public class StatisticsChart {
         XAxis x = new XAxis();
         x.setType(AxisType.CATEGORY);
         averageSpo2Config.addxAxis(x);
+        x.setTitle("Age");
 
         YAxis y = new YAxis();
         y.setTitle("Number of alerts");
@@ -415,12 +420,13 @@ public class StatisticsChart {
         grid.addColumn("Glucose Alerts", Integer.class);  
         grid.addColumn("SpO2 Alerts", Integer.class);  
         grid.addColumn("IP", String.class);
+        grid.addColumn("Port", String.class);
         
      
         if(patientDataManager.getPatientList() != null && !patientDataManager.getPatientList().isEmpty()){
             for(RegisteredPatients p : patientDataManager.getPatientList()){
                 grid.addRow(p.getName(), p.getGender(), p.getAge(), p.getHeartRateALertFrequency().size(), p.getTemperatureAlertFrequency().size(),
-                        p.getPressureAlertFrequency().size(), p.getGlucoseAlertFrequency().size(), p.getSpo2AlertFrequency().size(), p.getIp());
+                        p.getPressureAlertFrequency().size(), p.getGlucoseAlertFrequency().size(), p.getSpo2AlertFrequency().size(), p.getIp(), p.getPort().toString());
             }
         }  
         return grid;

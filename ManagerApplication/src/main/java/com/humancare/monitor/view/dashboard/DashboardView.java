@@ -37,6 +37,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.JLabel;
 
 @SuppressWarnings("serial")
 public final class DashboardView extends Panel implements View {
@@ -68,7 +69,7 @@ public final class DashboardView extends Panel implements View {
         DashboardEventBus.register(this);
                 
         dashboardCharts.setNumberOfDays(numberOfDays);
-        dashboardCharts.filterDataByDate();
+        dashboardCharts.filterDataByDate();        
         
         root = new VerticalLayout();
         root.setSizeFull();
@@ -76,9 +77,9 @@ public final class DashboardView extends Panel implements View {
         root.addStyleName("dashboard-view");
         setContent(root);
         Responsive.makeResponsive(root);
-
+        
         root.addComponent(buildHeader());
-
+        root.addComponent(dashboardCharts.getPatientName());
         Component content = buildContent();
         root.addComponent(content);
         root.setExpandRatio(content, 1);
@@ -320,6 +321,6 @@ public final class DashboardView extends Panel implements View {
             }
             setDescription(description);
         }
-    }
+    }   
 
 }
