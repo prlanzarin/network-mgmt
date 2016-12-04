@@ -6,7 +6,9 @@
 package com.humancare.monitor.view.sensors;
 
 import com.humancare.monitor.entities.Sensor;
+import com.humancare.monitor.snmp.Constants;
 import static com.humancare.monitor.snmp.Constants.OID_S;
+import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -18,6 +20,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.ui.Grid;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,6 +31,7 @@ import java.util.List;
 public class SensorsView extends VerticalLayout implements View {
     
     private PatientDataManager patientDataManager = PatientDataManager.getInstance();
+    private Manager manager = Manager.getInstance();
     private CssLayout panels;
     
     public SensorsView() {
@@ -77,6 +82,7 @@ public class SensorsView extends VerticalLayout implements View {
         grid.addColumn("Batery", String.class);
         grid.addColumn("Batery Alert", String.class);       
         
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");           
         String numberOfsensorsString = patientDataManager.getByOID(OID_S.get("hcSensorNumber"));
         int numberOfSensors = 0;
         if(numberOfsensorsString != null){
@@ -89,10 +95,15 @@ public class SensorsView extends VerticalLayout implements View {
         
         if(sensors != null && !sensors.isEmpty()){
             sensors.stream().forEach((s) -> {
-                grid.addRow(s.getType(), s.getLocation(), s.getBatteryPower() + "%", s.getBatteryAlert() == 1 ? "Alert!!" : "-");
+                grid.addRow(s.getType(), s.getLocation(), s.getBatteryPower() + "%", s.getBatteryPower() < 14 ? "Alert!!" : "-");
+                
+                if(s.getBatteryPower() < 14){
+                    PatientDataManager.addNotification(s.getType(), 
+                                        "Sensor battery Alert!", sdf.format(new Date(System.currentTimeMillis())), "Low battery: " + s.getBatteryPower() +"%");       
+                    //manager.set(Constants.sensorBatteryAlert.append(s.getIndex), 1);
+                }
             });
         }      
-        //grid.addRow("Teste", "LOcal teste", 80 + "%", "-");
         
         layout.addComponent(grid);
         return layout;

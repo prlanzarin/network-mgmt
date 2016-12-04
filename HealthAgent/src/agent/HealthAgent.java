@@ -4,6 +4,7 @@ import agent.model.MibContainer;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInput;
@@ -190,6 +191,12 @@ public class HealthAgent extends TestAgent {
             this.executorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
+                    try {
+                        simulation = new FileInputStream("/home/amanda/NetBeansProjects/network-mgmt/PatientMonitorSimulator/patientData.txt");
+                    } catch (FileNotFoundException e) {
+                        System.out.println("File patientData.txt was not found on the same directory as this .jar");
+                        System.exit(1);
+                    }
                     InputStream buffer = new BufferedInputStream(simulation);
                     ObjectInput input = null;
                     try {
@@ -200,8 +207,8 @@ public class HealthAgent extends TestAgent {
                     if (input != null) {
                         generateMibData(buffer, input);
                     }
-                }
-            }, 0, 2, TimeUnit.MILLISECONDS
+                }                
+            }, 0, 100, TimeUnit.MILLISECONDS
             );
         }
     }
@@ -252,35 +259,36 @@ public class HealthAgent extends TestAgent {
             Entry thisEntry = (Entry) entries.next();
             OID oid = (OID) thisEntry.getKey();
             MOScalar smo = (MOScalar) thisEntry.getValue();
-
-            if (oid.equals(Constants.bdBloodPressure)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.usrLatitude)
-                || oid.equals(Constants.usrLongitude)) {
-                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.usrOrientationX)
-                || oid.equals(Constants.usrOrientationY)
-                || oid.equals(Constants.usrOrientationZ)) {
-                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.bdTemperature)) {
-                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.bdHeartRate)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.bdHeartRhythmLeadI)
-                || oid.equals(Constants.bdHeartRhythmLeadII)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.bdBloodGlucose)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.bdBloodOxygenSaturation)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.envHumidity)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.envTemperature)) {
-                mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.envLuminosity)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
-            } else if (oid.equals(Constants.envOxygen)) {
-                mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+            if(simulationData.get(oid) != null){
+                if (oid.equals(Constants.bdBloodPressure)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.usrLatitude)
+                    || oid.equals(Constants.usrLongitude)) {
+                    mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.usrOrientationX)
+                    || oid.equals(Constants.usrOrientationY)
+                    || oid.equals(Constants.usrOrientationZ)) {
+                    mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.bdTemperature)) {
+                    mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.bdHeartRate)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.bdHeartRhythmLeadI)
+                    || oid.equals(Constants.bdHeartRhythmLeadII)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.bdBloodGlucose)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.bdBloodOxygenSaturation)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.envHumidity)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.envTemperature)) {
+                    mib.updateScalar(smo, Utils.genIntegerScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.envLuminosity)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                } else if (oid.equals(Constants.envOxygen)) {
+                    mib.updateScalar(smo, Utils.genGaugeScalarData(oid, simulationData));
+                }
             }
         }
     }

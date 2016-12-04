@@ -1,14 +1,10 @@
 package agent;
 
 
-import agent.HealthAgent;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
-import utils.Constants;
 
 public class Agent {
 
@@ -41,7 +37,7 @@ public class Agent {
         }
         InputStream simulation = null;
         try {
-            simulation = new FileInputStream("/home/prlanzarin/github/network-mgmt/PatientMonitorSimulator/patientData.txt");
+            simulation = new FileInputStream("/home/amanda/NetBeansProjects/network-mgmt/PatientMonitorSimulator/patientData.txt");
         } catch (FileNotFoundException e) {
             System.out.println("File patientData.txt was not found on the same directory as this .jar");
             System.exit(1);

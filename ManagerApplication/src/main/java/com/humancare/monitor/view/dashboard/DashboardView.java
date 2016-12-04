@@ -5,9 +5,11 @@ import java.util.Collection;
 import com.google.common.eventbus.Subscribe;
 import com.humancare.monitor.DashboardUI;
 import com.humancare.monitor.domain.DashboardNotification;
+import com.humancare.monitor.entities.PatientData;
 import com.humancare.monitor.event.DashboardEvent.CloseOpenWindowsEvent;
 import com.humancare.monitor.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import com.humancare.monitor.event.DashboardEventBus;
+import com.humancare.monitor.snmp.Manager;
 import com.humancare.monitor.snmp.PatientDataManager;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
@@ -15,6 +17,7 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.data.ListDataSource;
 import com.vaadin.ui.Alignment;
@@ -27,6 +30,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import static com.vaadin.ui.Notification.TYPE_HUMANIZED_MESSAGE;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -51,6 +55,7 @@ public final class DashboardView extends Panel implements View {
     private int numberOfDays = 7;
     private DashboardCharts dashboardCharts = DashboardCharts.getInstance();
     private PatientDataManager patientDataManager = PatientDataManager.getInstance();
+    private Manager manager = Manager.getInstance();
     
     
      
@@ -88,6 +93,25 @@ public final class DashboardView extends Panel implements View {
                 DashboardEventBus.post(new CloseOpenWindowsEvent());
             }
         });
+        
+        new Thread(){
+            
+            public void run(){
+                try {
+                    while(true){                    
+                        Thread.sleep(1000);   
+                        if(manager.getAddress() != null){
+                            patientDataManager.getAllPatientInfo();       
+                            patientDataManager.getEnvInfo();
+                            Thread.sleep(10000);                             
+                        }
+                    }
+                } catch (InterruptedException ex) {                    
+                    System.out.println("Thread stopped");
+                    ex.printStackTrace();
+                }
+            }
+        }.start();
         
         
     }
@@ -136,9 +160,16 @@ public final class DashboardView extends Panel implements View {
         ok.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(final ClickEvent event) {
-                dashboardCharts.setNumberOfDays(daysSelect.getValue());
-                dashboardCharts.filterDataByDate();
-                dashboardCharts.refreshAllGraphs();
+                if(manager.getAddress() != null){
+                    dashboardCharts.setNumberOfDays(daysSelect.getValue());
+                    dashboardCharts.filterDataByDate();
+                    dashboardCharts.refreshAllGraphs();
+                }else{
+                    Notification notif = new Notification("Hey, select a patient! :)",
+                        TYPE_HUMANIZED_MESSAGE);
+                    notif.setDelayMsec(3000);
+                    notif.show(Page.getCurrent());
+                }
             }
         });
 
