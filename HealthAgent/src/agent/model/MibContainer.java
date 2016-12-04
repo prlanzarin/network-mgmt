@@ -217,6 +217,16 @@ public class MibContainer {
         agent.registerManagedObject(this.sensorTable);
     }
 
+    /**
+     * Method responsible for updating a registered MO instance value.
+     *
+     * @param smo
+     * @param value
+     */
+    public void updateScalar(MOScalar smo, Variable value) {
+        smo.setValue(value);
+    }
+
     public void updateTableValue(OID oid, VariableBinding vb) {
         sensorTable.setValue(vb);
     }
