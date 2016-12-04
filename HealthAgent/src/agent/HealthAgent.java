@@ -186,31 +186,7 @@ public class HealthAgent extends TestAgent {
         run();
         sendColdStartNotification();
 
-        //getting info from simulation file
-        if (simulation != null) {
-            this.executorService.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        simulation = new FileInputStream("/home/amanda/NetBeansProjects/network-mgmt/PatientMonitorSimulator/patientData.txt");
-                    } catch (FileNotFoundException e) {
-                        System.out.println("File patientData.txt was not found on the same directory as this .jar");
-                        System.exit(1);
-                    }
-                    InputStream buffer = new BufferedInputStream(simulation);
-                    ObjectInput input = null;
-                    try {
-                        input = new ObjectInputStream(buffer);
-                    } catch (IOException ex) {
-                        Logger.getLogger(HealthAgent.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    if (input != null) {
-                        generateMibData(buffer, input);
-                    }
-                }                
-            }, 0, 100, TimeUnit.MILLISECONDS
-            );
-        }
+
     }
 
     public MibContainer getMibContainer() {
@@ -242,7 +218,7 @@ public class HealthAgent extends TestAgent {
      * MO's values.
      *
      */
-    private void generateMibData(InputStream buffer, ObjectInput input) {
+    public void generateMibData(InputStream buffer, ObjectInput input) {
         HashMap scalarMappings = mib.getScalarMappings();
 
         try {
