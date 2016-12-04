@@ -42,12 +42,12 @@ public final class ScalarMOCreator {
                 return new OctetString(value != null ? "" : "");
             case "INTEGER":
                 int intValue = 0;
-                if(value != null)
+                if(value != null && !value.equals(""))
                     intValue = Integer.parseInt(value.toString());
                 return new Integer32(intValue);
             case "Gauge":
                 long longValue = 0;
-                if(value != null)
+                if(value != null && !value.equals(""))
                     longValue = Long.parseLong(value.toString());
                 return new Gauge32(longValue);
             default:
