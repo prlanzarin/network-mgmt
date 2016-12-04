@@ -62,7 +62,6 @@ public final class Utils {
     }
 
     public static Variable genIntegerScalarData(OID oid, HashMap<OID, String> simulationData) {
-        ScalarMOCreator.getVariable(simulationData.get(oid), "INTEGER");
         return ScalarMOCreator.getVariable(simulationData.get(oid), "INTEGER");
     }
 

@@ -182,6 +182,9 @@ public class DashboardCharts {
     public void updateTemperatureData() {
         for (PatientData p : filteredData) {
             DataSeriesItem item = new DataSeriesItem(p.getReceivedDateAndTime(), p.getTemperature());
+            if(validate.tempAlert(p.getTemperature())){
+                item.setColor(SolidColor.RED);
+            }
             // add item, select updateChartImmediately option
             temperatureData.add(item, true, false);
         }

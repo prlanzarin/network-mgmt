@@ -37,7 +37,7 @@ public class PatientDataManager {
 
     private static PatientDataManager instance = null;
 
-    private final OID PATIENT_INFO_OIDS[] = {OID_S.get("usrName"), OID_S.get("usrAge"), OID_S.get("usrGender"), OID_S.get("usrName"), OID_S.get("usrLatitude"),
+    private final OID PATIENT_INFO_OIDS[] = {OID_S.get("usrName"), OID_S.get("usrAge"), OID_S.get("usrGender"), OID_S.get("usrLatitude"),
         OID_S.get("usrLongitude"), OID_S.get("usrX"), OID_S.get("usrY"), OID_S.get("usrZ"), OID_S.get("bloodPressure"), OID_S.get("temperature"),
         OID_S.get("heartRate"), OID_S.get("bloodGlucose"), OID_S.get("spo2")};
 
@@ -78,9 +78,9 @@ public class PatientDataManager {
     // TODO: avaliar parametros necessarios
     public PatientData getAllPatientInfo() {
         patientData = MANAGER.getAllPatientInformation(PATIENT_INFO_OIDS);
-
         //save new patient in patientMemory
-        patientDB.add(patientData);
+        if(patientData != null)
+            patientDB.add(patientData);
         return patientData;
     }
 
@@ -127,7 +127,7 @@ public class PatientDataManager {
         cal.setTime(currentDate);
         cal.add(Calendar.DAY_OF_YEAR, -numberOfDays);
 
-        if (!patientDB.isEmpty()) {
+        if (!patientDB.isEmpty() && currentPatient != null) {
             patientDB.stream().filter((p) -> (currentPatient.getName().
                 equals(p.getName()))).forEach((p) -> {
                 Calendar temp = Calendar.getInstance();

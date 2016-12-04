@@ -41,9 +41,12 @@ public final class ScalarMOCreator {
             case "OCTET STRING":
                 return new OctetString(value != null ? "" : "");
             case "INTEGER":
-                return new Integer32(value != null ? (Integer) value : 0);
-            case "Gauge":
-                return new Gauge32(value != null ? (Integer) value : 0);
+                int intValue = 0;
+                if(value != null)
+                    intValue = Integer.parseInt(value.toString());
+                return new Integer32(intValue);
+            case "Gauge":                
+                return new Gauge32(Long.parseLong(value.toString()));
             default:
                 return null;
         }
