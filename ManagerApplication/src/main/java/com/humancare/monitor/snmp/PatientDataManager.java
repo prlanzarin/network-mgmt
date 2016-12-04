@@ -182,11 +182,8 @@ public class PatientDataManager {
                 || MANAGER.set(OID_S.get("usrGender"), gender) == null) {
                 return false;
             }
-        } catch (RuntimeException ex) {
-            System.out.println("Connection time out");
-            return false;
-        } catch (IOException ex) {
-            System.out.println("Error gathering agent connection");
+        }  catch (IOException ex) {
+            System.out.println("  [ADD-P] Error gathering agent connection");
             return false;
         }
 

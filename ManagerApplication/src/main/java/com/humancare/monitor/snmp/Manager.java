@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
@@ -136,9 +138,9 @@ public class Manager {
         ResponseEvent event = snmp.getBulk(pdu, target);
         if (event != null) {
             return event;
-        }
-        else
+        } else {
             throw new RuntimeException("GETBULK timed out");
+        }
     }
 
     /**
@@ -162,10 +164,11 @@ public class Manager {
         pdu.setType(PDU.SET);
         pdu.setRequestID(new Integer32(requestID++));
         ResponseEvent response = snmp.set(pdu, target);
-        if (response != null)
+        if (response != null) {
             return response;
-        else
+        } else {
             throw new RuntimeException("SET timed out");
+        }
     }
 
     /**
@@ -176,7 +179,7 @@ public class Manager {
      * @return
      * @throws IOException
      */
-    public ResponseEvent set(OID oid, Integer value) throws IOException {
+    public ResponseEvent set(OID oid, Integer value) {
         Target target = getTarget(PUBLIC_COMMUNITY);
         if (target == null) {
             return null;
@@ -189,10 +192,17 @@ public class Manager {
         pdu.setType(PDU.SET);
         pdu.setRequestID(new Integer32(requestID++));
 
-        ResponseEvent response = snmp.set(pdu, target);
-        System.out.println(response.getError().toString());
+        ResponseEvent response;
+        try {
+            response = snmp.set(pdu, target);
+        } catch (IOException ex) {
+            Logger.getLogger(Manager.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        } catch (RuntimeException ex) {
+            Logger.getLogger(Manager.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
         return response;
-
     }
 
     /**
@@ -224,10 +234,10 @@ public class Manager {
             patientData.setReceivedDateAndTime(System.currentTimeMillis());
             response = get(oids);
         } catch (RuntimeException ex) {
-            System.out.println("Connection time out");
+            System.out.println("  [GET-PAT] Connection time out");
             return null;
         } catch (IOException ex) {
-            System.out.println("Error to find patient information");
+            System.out.println("Error findinding patient information");
             return null;
         }
 
@@ -257,10 +267,10 @@ public class Manager {
             ResponseEvent response = get(oids);
             pdu = response.getResponse();
         } catch (RuntimeException ex) {
-            System.out.println("Connection time out");
+            System.out.println("  [GET-ENV] Connection time out");
             return null;
         } catch (IOException ex) {
-            System.out.println("Error to find envoriment information");
+            System.out.println("Error to find environment information");
             return null;
         }
         if (pdu != null) {
@@ -269,9 +279,9 @@ public class Manager {
             patientData.setEnvLuminosity(Integer.parseInt(pdu.get(2).getVariable().toString()));
             patientData.setEnvOxygen(Integer.parseInt(pdu.get(3).getVariable().toString()));
             patientData.setEnvAlarm(pdu.get(4).getVariable().toString().equals("SIM"));
-        }
-        else
+        } else {
             return null;
+        }
 
         return patientData;
     }
@@ -285,7 +295,7 @@ public class Manager {
             patientData.setNwSpeed(pdu.get(1).getVariable().toString());
 
         } catch (RuntimeException ex) {
-            System.out.println("Connection time out");
+            System.out.println("  [GET-NET] Connection time out");
             return null;
         } catch (IOException ex) {
             System.out.println("Error to find network information");
@@ -311,7 +321,7 @@ public class Manager {
         try {
             response = snmp.getBulk(pdu, target);
         } catch (RuntimeException ex) {
-            System.out.println("Connection time out");
+            System.out.println("  [GET-SEN] Connection time out");
         } catch (IOException ex) {
             System.out.println("Erro ao buscar informaçoes de sensores");
             return null;
