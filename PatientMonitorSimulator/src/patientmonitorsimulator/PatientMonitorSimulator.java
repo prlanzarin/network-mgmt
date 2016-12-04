@@ -210,25 +210,25 @@ public class PatientMonitorSimulator extends JFrame{
     
     public void populateHashTable(){
         oidValues.clear();
-        oidValues.put(Constants.usrName, name.getText());
-        oidValues.put(Constants.usrAge, age.getText());
+        oidValues.put(Constants.usrName, name.getText().trim());
+        oidValues.put(Constants.usrAge, age.getText().trim());
         oidValues.put(Constants.usrGender, optionF.isSelected() ? "F": "M");
-        oidValues.put(Constants.usrLatitude, latitude.getText());
-        oidValues.put(Constants.usrLongitude, longitude.getText());
-        oidValues.put(Constants.usrOrientationX, x.getText());
-        oidValues.put(Constants.usrOrientationY, y.getText());
-        oidValues.put(Constants.usrOrientationZ, z.getText());
+        oidValues.put(Constants.usrLatitude, latitude.getText().trim());
+        oidValues.put(Constants.usrLongitude, longitude.getText().trim());
+        oidValues.put(Constants.usrOrientationX, x.getText().trim());
+        oidValues.put(Constants.usrOrientationY, y.getText().trim());
+        oidValues.put(Constants.usrOrientationZ, z.getText().trim());
     
-        oidValues.put(Constants.bdBloodGlucose, glucose.getText());
-        oidValues.put(Constants.bdBloodOxygenSaturation, oxygen.getText());
-        oidValues.put(Constants.bdBloodPressure, pressure.getText());
-        oidValues.put(Constants.bdHeartRate, heartRate.getText());
-        oidValues.put(Constants.bdTemperature, temperature.getText());
+        oidValues.put(Constants.bdBloodGlucose, glucose.getText().trim());
+        oidValues.put(Constants.bdBloodOxygenSaturation, oxygen.getText().trim());
+        oidValues.put(Constants.bdBloodPressure, pressure.getText().trim());
+        oidValues.put(Constants.bdHeartRate, heartRate.getText().trim());
+        oidValues.put(Constants.bdTemperature, temperature.getText().trim());
         
-        oidValues.put(Constants.envHumidity, envHumidity.getText());
-        oidValues.put(Constants.envOxygen, envOxygen.getText());
-        oidValues.put(Constants.envTemperature, envTemperature.getText());
-        oidValues.put(Constants.envLuminosity, envLuminosity.getText());
+        oidValues.put(Constants.envHumidity, envHumidity.getText().trim());
+        oidValues.put(Constants.envOxygen, envOxygen.getText().trim());
+        oidValues.put(Constants.envTemperature, envTemperature.getText().trim());
+        oidValues.put(Constants.envLuminosity, envLuminosity.getText().trim());
     
     }
     
