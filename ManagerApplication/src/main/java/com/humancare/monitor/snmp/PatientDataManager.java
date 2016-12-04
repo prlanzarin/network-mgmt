@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.smi.OID;
 
 /*
@@ -54,18 +55,19 @@ public class PatientDataManager {
 
     // list of patients registered by manager
     private List<RegisteredPatients> registPatientList;
-    
+
     private static Collection<DashboardNotification> notifications = new ArrayList();
 
     private int femPatientsNumber;
     private int malePatientsNumber;
 
     private Manager MANAGER = Manager.getInstance();
-    
-    protected PatientDataManager(){}
-    
-    public static PatientDataManager getInstance(){
-        if(instance == null){
+
+    protected PatientDataManager() {
+    }
+
+    public static PatientDataManager getInstance() {
+        if (instance == null) {
             instance = new PatientDataManager();
         }
         return instance;
@@ -79,8 +81,9 @@ public class PatientDataManager {
     public PatientData getAllPatientInfo() {
         patientData = MANAGER.getAllPatientInformation(PATIENT_INFO_OIDS);
         //save new patient in patientMemory
-        if(patientData != null)
+        if (patientData != null) {
             patientDB.add(patientData);
+        }
         return patientData;
     }
 
@@ -177,10 +180,13 @@ public class PatientDataManager {
             if (MANAGER.set(OID_S.get("usrName"), name) == null
                 || MANAGER.set(OID_S.get("usrAge"), age) == null
                 || MANAGER.set(OID_S.get("usrGender"), gender) == null) {
-                System.out.println("WELP THIS IS FALSE BOYO");
                 return false;
             }
+        } catch (RuntimeException ex) {
+            System.out.println("Connection time out");
+            return false;
         } catch (IOException ex) {
+            System.out.println("Error gathering agent connection");
             return false;
         }
 
@@ -208,7 +214,8 @@ public class PatientDataManager {
         }
 
     }
-    public static void addNotification(String name, String action, String time, String content){
+
+    public static void addNotification(String name, String action, String time, String content) {
         DashboardNotification n1 = new DashboardNotification();
         n1.setId(1);
         n1.setFirstName(name);
@@ -217,17 +224,17 @@ public class PatientDataManager {
         n1.setPrettyTime(time);
         n1.setContent(content);
         notifications.add(n1);
-    
+
     }
-    
-    public Collection<DashboardNotification> getNotifications(){
-        for(DashboardNotification notification : notifications) {
+
+    public Collection<DashboardNotification> getNotifications() {
+        for (DashboardNotification notification : notifications) {
             notification.setRead(true);
         }
-        return Collections.unmodifiableCollection(notifications);     
+        return Collections.unmodifiableCollection(notifications);
     }
-    
-    public static int getCountNotifications(){
+
+    public static int getCountNotifications() {
         Predicate<DashboardNotification> unreadPredicate = new Predicate<DashboardNotification>() {
             @Override
             public boolean apply(DashboardNotification input) {
@@ -236,6 +243,7 @@ public class PatientDataManager {
         };
         return Collections2.filter(notifications, unreadPredicate).size();
     }
+
     public RegisteredPatients getCurrentPatient() {
         return currentPatient;
     }
