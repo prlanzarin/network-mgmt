@@ -137,7 +137,8 @@ public class Manager {
         if (event != null) {
             return event;
         }
-        throw new RuntimeException("GETBULK timed out");
+        else
+            throw new RuntimeException("GETBULK timed out");
     }
 
     /**
@@ -148,7 +149,7 @@ public class Manager {
      * @return
      * @throws IOException
      */
-    public ResponseEvent set(OID oid, String value) throws IOException {
+    public ResponseEvent set(OID oid, String value) throws IOException, RuntimeException {
         Target target = getTarget(PUBLIC_COMMUNITY);
         if (target == null) {
             return null;
@@ -161,7 +162,10 @@ public class Manager {
         pdu.setType(PDU.SET);
         pdu.setRequestID(new Integer32(requestID++));
         ResponseEvent response = snmp.set(pdu, target);
-        return response;
+        if (response != null)
+            return response;
+        else
+            throw new RuntimeException("SET timed out");
     }
 
     /**
@@ -186,6 +190,7 @@ public class Manager {
         pdu.setRequestID(new Integer32(requestID++));
 
         ResponseEvent response = snmp.set(pdu, target);
+        System.out.println(response.getError().toString());
         return response;
 
     }
@@ -223,7 +228,6 @@ public class Manager {
             return null;
         } catch (IOException ex) {
             System.out.println("Error to find patient information");
-            ex.printStackTrace();
             return null;
         }
 
