@@ -273,22 +273,6 @@ sensorBatteryAlert  OBJECT-TYPE
 		"Sensor's battery alert indicator (1 - alert. 0 - normal). Should be used to enable visual feedback about the sensor's recharging need."
 	::= { hcSensorEntry 5 }
 
-nwType  OBJECT-TYPE
-	SYNTAX     INTEGER
-	ACCESS     read-write
-	STATUS     mandatory
-	DESCRIPTION 
-		"Type of the network used to connect the user's remote agent to a given manager. The value determine its type in accordance to an enumerated table."
-	::= { hcNetwork 1 }
-
-
-nwSpeed  OBJECT-TYPE
-	SYNTAX     Gauge
-	ACCESS     read-only
-	STATUS     mandatory
-	DESCRIPTION 
-		"An estimation of the network's current bandwidth in bits per second."
-	::= { hcNetwork 2 }
 END
 
 -- This MIB was created using NuDesign Technologies' Visual MIBuilder (Ver 5.2).
